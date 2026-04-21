@@ -8,6 +8,7 @@ interface MicButtonProps {
   onTranscript: (transcript: string) => void;
   onError: (error: string) => void;
   disabled?: boolean;
+  isInFlow?: boolean;
 }
 
 export default function MicButton({
@@ -15,11 +16,11 @@ export default function MicButton({
   onTranscript,
   onError,
   disabled = false,
+  isInFlow = false,
 }: MicButtonProps) {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const recognitionRef = useRef<any>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   useEffect(() => {
     // Initialize Web Speech API
@@ -58,7 +59,7 @@ export default function MicButton({
         type="button"
         onClick={isListening ? stopListening : startListening}
         disabled={disabled}
-        className={`px-4 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2 ${
+        className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
           isListening
             ? "bg-red-500 hover:bg-red-600 text-white"
             : "bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white"
@@ -68,12 +69,12 @@ export default function MicButton({
         {isListening ? (
           <>
             <span className="animate-pulse inline-block w-3 h-3 bg-white rounded-full"></span>
-            Stop
+            Stop Recording
           </>
         ) : (
           <>
             <span>🎤</span>
-            Mic
+            Start Listening
           </>
         )}
       </button>
@@ -85,9 +86,6 @@ export default function MicButton({
           {transcript}
         </div>
       )}
-
-      {/* Error display */}
-      {/* Errors already shown in parent search bar, but can duplicate here if needed */}
     </div>
   );
 }

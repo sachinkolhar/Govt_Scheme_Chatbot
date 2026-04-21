@@ -7,6 +7,13 @@ import * as audioApi from "@/lib/audioApi";
 import { useAuthSession } from "@/lib/useAuthSession";
 
 type LanguageCode = "en" | "hi" | "te" | "ta";
+type VoiceState =
+  | "IDLE"
+  | "LISTENING_LANGUAGE"
+  | "LANGUAGE_SELECTED"
+  | "LISTENING_QUERY"
+  | "PROCESSING"
+  | "SPEAKING_RESPONSE";
 
 interface VoiceChatResponse {
   query: string;
@@ -19,24 +26,31 @@ interface VoiceHistoryMessage {
   content: string;
 }
 
-type VoiceStep = "language_selection" | "scheme_query";
-
 const LANGUAGE_SELECTION_PROMPT =
   "Can you please choose your preferred language?";
 const SCHEME_HELP_PROMPT = "How can I help you regarding government schemes?";
 
 export default function VoicePage() {
   const { token, user, sessionLoading, clearSession } = useAuthSession();
+  const [voiceState, setVoiceState] = useState<VoiceState>("IDLE");
   const [voiceLanguage, setVoiceLanguage] = useState<LanguageCode>("en");
-  const [voiceStep, setVoiceStep] = useState<VoiceStep>("language_selection");
-  const [voicePrompt, setVoicePrompt] = useState(LANGUAGE_SELECTION_PROMPT);
   const [voiceSupported, setVoiceSupported] = useState(false);
-  const [transcript, setTranscript] = useState("");
-  const [assistantAnswer, setAssistantAnswer] = useState("");
+  const [userLanguageTranscript, setUserLanguageTranscript] = useState("");
+  const [userQueryTranscript, setUserQueryTranscript] = useState("");
+  const [assistantResponse, setAssistantResponse] = useState("");
+  const [assistantSpeaking, setAssistantSpeaking] = useState("");
   const [voiceHistory, setVoiceHistory] = useState<VoiceHistoryMessage[]>([]);
-  const [queryLoading, setQueryLoading] = useState(false);
   const [voiceError, setVoiceError] = useState("");
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("Ready to start");
+  // Legacy state variables for backward compatibility (will be removed)
+  const [voiceStep] = useState<"language_selection" | "scheme_query">(
+    "language_selection",
+  );
+  const [transcript] = useState("");
+  const [assistantAnswer] = useState("");
+  const [queryLoading] = useState(false);
+  const [voicePrompt] = useState("");
 
   const languageNames: Record<LanguageCode, string> = {
     en: "English",
@@ -98,31 +112,72 @@ export default function VoicePage() {
     return (await response.json()) as VoiceChatResponse;
   }
 
-  async function handleSchemeVoiceQuery(queryText: string) {
-    const clean = queryText.trim();
-    if (!clean) return;
-
-    setQueryLoading(true);
-    setVoiceError("");
-    setTranscript(clean);
+  async function speakAssistantMessage(text: string) {
+    setAssistantSpeaking(text);
+    setIsSpeaking(true);
     try {
-      const response = await askSchemeAssistant(clean);
-      setAssistantAnswer(response.answer || "I could not find an answer.");
+      const result = await audioApi.synthesizeAndPlayAudio(text, voiceLanguage);
+      if (!result.success) {
+        setVoiceError(result.error || "Failed to play audio");
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to play audio";
+      setVoiceError(msg);
+    } finally {
+      setIsSpeaking(false);
+      setAssistantSpeaking("");
+    }
+  }
+
+  async function processLanguageSelection(detectedLanguage: LanguageCode) {
+    setVoiceLanguage(detectedLanguage);
+    setVoiceState("LANGUAGE_SELECTED");
+    setStatusMessage(`Language selected: ${languageNames[detectedLanguage]}`);
+    setAssistantResponse("");
+    setVoiceHistory([]);
+
+    // Speak the scheme help prompt
+    await speakAssistantMessage(SCHEME_HELP_PROMPT);
+
+    // Transition to listening for query
+    setVoiceState("LISTENING_QUERY");
+    setStatusMessage("Listening for your question...");
+  }
+
+  async function processSchemeQuery(queryText: string) {
+    setUserQueryTranscript(queryText);
+    setVoiceState("PROCESSING");
+    setStatusMessage("Processing your query...");
+    setVoiceError("");
+
+    try {
+      const response = await askSchemeAssistant(queryText);
+      setAssistantResponse(response.answer || "I could not find an answer.");
       setVoiceHistory((prev) => {
         const next = [
           ...prev,
-          { role: "user" as const, content: clean },
+          { role: "user" as const, content: queryText },
           { role: "assistant" as const, content: response.answer || "" },
         ];
         return next.slice(-8);
       });
-      setVoicePrompt(SCHEME_HELP_PROMPT);
+
+      // Transition to speaking response
+      setVoiceState("SPEAKING_RESPONSE");
+      setStatusMessage("Speaking response...");
+      await speakAssistantMessage(
+        response.answer || "I could not find an answer.",
+      );
+
+      // Return to idle after speaking
+      setVoiceState("IDLE");
+      setStatusMessage("Ready to start a new query");
     } catch (err) {
       const msg =
         err instanceof Error ? err.message : "Voice assistant request failed";
       setVoiceError(msg);
-    } finally {
-      setQueryLoading(false);
+      setVoiceState("IDLE");
+      setStatusMessage("Error occurred. Ready to start again.");
     }
   }
 
@@ -132,55 +187,38 @@ export default function VoicePage() {
 
     setVoiceError("");
 
-    if (voiceStep === "language_selection") {
+    if (voiceState === "LISTENING_LANGUAGE") {
+      setUserLanguageTranscript(clean);
       const detectedLanguage = detectLanguageFromTranscript(clean);
       if (!detectedLanguage) {
-        setVoicePrompt(
-          `${LANGUAGE_SELECTION_PROMPT} (English, Hindi, Telugu, Tamil)`,
-        );
         setVoiceError(
-          "Could not detect language. Please say English, Hindi, Telugu, or Tamil.",
+          "Could not detect language. Please say: English, Hindi, Telugu, or Tamil.",
+        );
+        setVoiceState("LISTENING_LANGUAGE");
+        setStatusMessage(
+          "Listening for language (say: English, Hindi, Telugu, or Tamil)...",
         );
         return;
       }
 
-      setVoiceLanguage(detectedLanguage);
-      setVoiceStep("scheme_query");
-      setAssistantAnswer("");
-      setVoiceHistory([]);
-      setVoicePrompt(
-        `${SCHEME_HELP_PROMPT} Selected language: ${languageNames[detectedLanguage]}.`,
-      );
+      await processLanguageSelection(detectedLanguage);
       return;
     }
 
-    await handleSchemeVoiceQuery(clean);
+    if (voiceState === "LISTENING_QUERY") {
+      await processSchemeQuery(clean);
+      return;
+    }
   }
 
-  async function handleSpeak(text: string) {
-    const clean = text.trim();
-    if (!clean) {
-      setVoiceError("Enter text or record audio before playback.");
-      return;
-    }
-
+  function startVoiceFlow() {
+    setVoiceState("LISTENING_LANGUAGE");
+    setStatusMessage("Listening for language...");
+    setUserLanguageTranscript("");
+    setUserQueryTranscript("");
+    setAssistantResponse("");
+    setAssistantSpeaking("");
     setVoiceError("");
-    setIsSpeaking(true);
-    try {
-      const result = await audioApi.synthesizeAndPlayAudio(
-        clean,
-        voiceLanguage,
-      );
-      if (!result.success) {
-        setVoiceError(result.error || "Voice playback failed");
-        return;
-      }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Voice playback failed";
-      setVoiceError(msg);
-    } finally {
-      setIsSpeaking(false);
-    }
   }
 
   function logout() {
@@ -227,8 +265,7 @@ export default function VoicePage() {
               Voice Assistant
             </h1>
             <p className="text-sm text-gray-500">
-              Hello {greetingName} - dedicated voice input and playback
-              workspace
+              Hello {greetingName} - dedicated voice-driven assistant
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -249,133 +286,129 @@ export default function VoicePage() {
       </header>
 
       <section className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+        {/* Voice Control Section */}
         <section className="bg-white rounded-2xl border border-orange-100 shadow-sm p-6">
-          <h2 className="text-xl font-bold text-gray-800">Voice Input</h2>
+          <h2 className="text-xl font-bold text-gray-800">Voice Control</h2>
           <p className="text-sm text-gray-500 mt-1">
-            Press the mic and follow the guided voice flow for language and
-            scheme queries.
+            Click the Mic button to start the complete voice interaction flow
           </p>
 
-          <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-900">
-            {voicePrompt}
+          {/* Status Display */}
+          <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
+            <div className="text-sm font-semibold text-blue-900">
+              Status: {statusMessage}
+            </div>
+            {voiceState !== "IDLE" && (
+              <div className="text-xs text-blue-700 mt-1">
+                State: {voiceState}
+              </div>
+            )}
           </div>
 
-          <div className="mt-4 flex items-center gap-3 flex-wrap">
-            <label
-              htmlFor="voice-lang"
-              className="text-sm font-medium text-gray-700"
-            >
-              Language:
-            </label>
-            <select
-              id="voice-lang"
-              value={voiceLanguage}
-              onChange={(e) => setVoiceLanguage(e.target.value as LanguageCode)}
-              className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg bg-white hover:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
-            >
-              {(Object.keys(languageNames) as LanguageCode[]).map((lang) => (
-                <option key={lang} value={lang}>
-                  {languageNames[lang]}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="mt-4">
+          {/* Mic Button - Single Control */}
+          <div className="mt-6 flex justify-center">
             <MicButton
               language={voiceLanguage}
               onTranscript={(text) => {
+                if (voiceState === "IDLE") {
+                  startVoiceFlow();
+                }
                 void handleMicTranscript(text);
               }}
               onError={(error) => setVoiceError(error)}
-              disabled={!voiceSupported || isSpeaking || queryLoading}
+              disabled={!voiceSupported || isSpeaking}
             />
           </div>
 
-          <div className="mt-3 flex items-center gap-2 text-xs text-gray-600">
-            <span className="rounded-full bg-gray-100 px-2 py-1">
-              Step:{" "}
-              {voiceStep === "language_selection"
-                ? "Choose language"
-                : "Ask scheme"}
-            </span>
-            <span className="rounded-full bg-gray-100 px-2 py-1">
-              Active language: {languageNames[voiceLanguage]}
-            </span>
-          </div>
-
-          <div className="mt-4 space-y-3">
-            <label className="block text-sm font-medium text-gray-700">
-              Transcript
-            </label>
-            <textarea
-              value={transcript}
-              onChange={(e) => setTranscript(e.target.value)}
-              rows={4}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-              placeholder="Your recorded transcript appears here..."
-            />
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => void handleSchemeVoiceQuery(transcript)}
-                disabled={queryLoading || !transcript.trim()}
-                className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:bg-green-300"
-              >
-                {queryLoading ? "Searching..." : "Ask About This Scheme"}
-              </button>
-              <button
-                type="button"
-                onClick={() => void handleSpeak(transcript)}
-                disabled={isSpeaking || !transcript.trim()}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:bg-blue-300"
-              >
-                {isSpeaking ? "Playing..." : "Play Transcript"}
-              </button>
+          {/* Instructions */}
+          {voiceState === "IDLE" && (
+            <div className="mt-4 text-center">
+              <p className="text-sm text-gray-600">
+                Click the Mic button above to start. The assistant will guide
+                you through:
+              </p>
+              <ol className="text-xs text-gray-600 mt-2 space-y-1">
+                <li>1. Select your preferred language</li>
+                <li>2. Ask about government schemes</li>
+                <li>3. Receive voice response with answers</li>
+              </ol>
             </div>
-          </div>
-        </section>
-
-        <section className="bg-white rounded-2xl border border-orange-100 shadow-sm p-6">
-          <h2 className="text-xl font-bold text-gray-800">
-            Scheme Assistant Response
-          </h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Voice queries are answered directly by Groq without database lookup.
-          </p>
-
-          {!assistantAnswer && (
-            <p className="mt-4 text-sm text-gray-500">
-              Ask a scheme question using mic or transcript to see assistant
-              results.
-            </p>
-          )}
-
-          {assistantAnswer && (
-            <>
-              <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 px-3 py-3 text-sm text-gray-800 whitespace-pre-wrap">
-                {assistantAnswer}
-              </div>
-              <div className="mt-3 flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => void handleSpeak(assistantAnswer)}
-                  disabled={isSpeaking}
-                  className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:bg-orange-300"
-                >
-                  {isSpeaking ? "Playing..." : "Play Answer"}
-                </button>
-              </div>
-            </>
           )}
         </section>
 
+        {/* Transcript Section */}
+        {(userLanguageTranscript || userQueryTranscript) && (
+          <section className="bg-white rounded-2xl border border-orange-100 shadow-sm p-6">
+            <h2 className="text-xl font-bold text-gray-800">
+              Conversation Transcript
+            </h2>
+            <div className="mt-4 space-y-3">
+              {userLanguageTranscript && (
+                <div className="border-l-4 border-blue-500 bg-blue-50 p-3">
+                  <div className="text-xs font-semibold text-blue-900 mb-1">
+                    User (Language Selection):
+                  </div>
+                  <div className="text-sm text-blue-800">
+                    {userLanguageTranscript}
+                  </div>
+                  <div className="text-xs text-blue-600 mt-1">
+                    Selected: {languageNames[voiceLanguage]}
+                  </div>
+                </div>
+              )}
+              {userQueryTranscript && (
+                <div className="border-l-4 border-green-500 bg-green-50 p-3">
+                  <div className="text-xs font-semibold text-green-900 mb-1">
+                    User (Query):
+                  </div>
+                  <div className="text-sm text-green-800">
+                    {userQueryTranscript}
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* Assistant Speaking Section */}
+        {assistantSpeaking && (
+          <section className="bg-white rounded-2xl border border-purple-100 shadow-sm p-6">
+            <h2 className="text-xl font-bold text-gray-800">
+              Assistant Speaking
+            </h2>
+            <div className="mt-4 rounded-lg border border-purple-200 bg-purple-50 px-4 py-3">
+              <div className="text-sm text-purple-900 italic">
+                "{assistantSpeaking}"
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Assistant Response Section */}
+        {assistantResponse && (
+          <section className="bg-white rounded-2xl border border-orange-100 shadow-sm p-6">
+            <h2 className="text-xl font-bold text-gray-800">
+              Assistant Response
+            </h2>
+            <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+              <div className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
+                {assistantResponse}
+              </div>
+            </div>
+            <div className="mt-3 text-xs text-gray-500">
+              Language: {languageNames[voiceLanguage]}
+            </div>
+          </section>
+        )}
+
+        {/* Error Section */}
         {voiceError && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+          <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+            <div className="font-semibold mb-1">Error:</div>
             {voiceError}
             <button
               onClick={() => setVoiceError("")}
-              className="ml-2 underline hover:no-underline"
+              className="ml-2 underline hover:no-underline text-red-600"
             >
               Dismiss
             </button>
