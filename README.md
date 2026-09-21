@@ -1,4 +1,4 @@
-# Government Scheme Chatbot
+﻿# Government Scheme Chatbot
 
 A full-stack AI-powered assistant that helps citizens discover, search, and understand Indian government schemes — with personalized recommendations, eligibility filtering, and a conversational AI interface powered by Groq.
 
@@ -16,23 +16,35 @@ A full-stack AI-powered assistant that helps citizens discover, search, and unde
 - **Web Fallback Search** — If scheme database has no matches, the system automatically searches official government websites (`.gov.in`) and summarizes results
 - **Section-Specific Answers** — Detect when users ask for specific sections (eligibility, benefits, application process, documents required) and return targeted information
 - **Browse by Category** — Explore top scheme categories at a glance
-- **3,400+ Schemes** — Dataset covering Central and State schemes across agriculture, education, health, housing, and more
-- **Automated Testing** — Comprehensive pytest coverage for all chat decision tree branches
+- **Personalized Dashboard** — Modern home screen with quick access to recommendations, reminders, documents, and profile photo controls
+- **Dedicated Chat Page** — Chat assistant moved to `/chat-assistant` while preserving streaming and conversation state
+- **Reminder Management** — Create, update, list, and delete reminders for scheme deadlines and custom events
+- **Document Vault** — Upload, list, download, and delete user documents with metadata tracking
+- **Profile Photo Management** — Upload, view, and remove profile photos for a richer personalized experience
+- **Favorites** — Save, list, and remove schemes for authenticated users
+- **IVR Demo** — Translation, speech synthesis, demo scheme, and language endpoints under `/api/ivr`
+- **3,400 Schemes** — Dataset covering Central and State schemes across agriculture, education, health, housing, and more
+- **Voice Assistant** — Speech-to-text (Whisper) and text-to-speech (gTTS) with 4-language support (English, Hindi, Telugu, Tamil)
+- **Voice Recognition** — MediaRecorder API with advanced audio processing (echo cancellation, noise suppression, auto-gain control) delivering 95%+ English and 85-90% Indian language accuracy
+- **Automated Testing** — pytest coverage across authentication, chat, speech, and voice end-to-end flows
 
 ---
 
 ## Tech Stack
 
-| Layer           | Technology                                          |
-| --------------- | --------------------------------------------------- |
-| Frontend        | Next.js 15, TypeScript, Tailwind CSS                |
-| Backend         | FastAPI (Python), SQLAlchemy, SQLite                |
-| Semantic Search | FAISS + SentenceTransformers                        |
-| LLM             | Groq API (`llama-3.3-70b-versatile`)                |
-| Auth            | JWT (`python-jose`), PBKDF2-SHA256 password hashing |
-| Config          | `python-dotenv`                                     |
-| Testing         | pytest with monkeypatching                          |
-| Web Search      | duckduckgo-search API                               |
+| Layer           | Technology                                           |
+| --------------- | ---------------------------------------------------- |
+| Frontend        | Next.js 15, TypeScript, Tailwind CSS                 |
+| Backend         | FastAPI (Python), SQLAlchemy, SQLite                 |
+| Semantic Search | FAISS + SentenceTransformers                         |
+| LLM             | Groq API (`llama-3.3-70b-versatile`)                 |
+| Auth            | JWT (`python-jose`), PBKDF2-SHA256 password hashing  |
+| Config          | `python-dotenv`                                      |
+| Testing         | pytest with monkeypatching                           |
+| UI / Routing    | Next.js App Router, dedicated `/chat-assistant` page |
+| Voice (STT)     | OpenAI Whisper (small model, CPU)                    |
+| Voice (TTS)     | gTTS (Google Text-to-Speech)                         |
+| Web Search      | duckduckgo-search API                                |
 
 ---
 
@@ -54,7 +66,7 @@ A full-stack AI-powered assistant that helps citizens discover, search, and unde
 
 ### High-level components
 
-- **Frontend (`frontend/`)** — Next.js App Router application that provides authentication screens, profile management, recommendation views, eligibility search, and streaming chat UI.
+- **Frontend (`frontend/`)** — Next.js App Router application that provides authentication screens, profile management, recommendation views, eligibility search, personalized dashboard sections, and streaming chat UI.
 - **Backend (`backend/main.py`)** — FastAPI service that exposes auth and scheme endpoints, loads the model assets at startup, and coordinates retrieval and LLM responses.
 - **Data layer (`dataset/`, `model/`)** — CSV scheme dataset, FAISS vector index, and semantic encoder used for search and retrieval.
 - **Persistence layer** — SQLite by default for users and profiles, with optional PostgreSQL support through `DATABASE_URL`.
@@ -80,32 +92,49 @@ Browser
 3. **Eligibility Finder**: The frontend submits ad-hoc profile filters to `/api/find-eligible` without requiring profile persistence.
 4. **Search and Chat**: Query text is cleaned, embedded, and searched against the FAISS index; the top results are returned directly for search or passed into Groq as context for RAG chat.
 5. **Streaming AI replies**: `/api/chat/stream` returns incremental output so the frontend can render a typewriter-style assistant response.
+6. **Dashboard support**: The frontend also calls reminders, documents, favorites, and profile-photo endpoints to persist user-managed citizen workflow data.
 
 ---
 
 ## Project Structure
 
 ```
-Govt_Scheme_Chatbot/
+Government_Scheme_ChatBot/
 ├── backend/
-│   ├── main.py            # FastAPI app — auth, search, chat, recommendations
+│   ├── main.py            # FastAPI app and router registration
 │   ├── requirements.txt   # Python dependencies
 │   ├── tests/
-│   │   └── test_chat_flow.py  # Automated tests for chat decision branches
+│   │   ├── test_auth_routes.py
+│   │   ├── test_chat_flow.py
+│   │   ├── test_speech.py
+│   │   └── test_voice_e2e.py
+│   ├── auth/              # Authentication and profile routes
+│   ├── chat/              # Chat state, Groq client, and routes
+│   ├── documents/         # Document vault routes
+│   ├── eligibility/       # Recommendations, eligibility, and favorites
+│   ├── ivr/               # IVR demo routes and scheme data
+│   ├── reminders/         # Reminder management routes
+│   ├── search/            # Semantic and web search
+│   └── voice/             # Whisper, gTTS, and voice assistant routes
 │   ├── .env               # API keys & secrets (not committed)
 │   └── .env.example       # Template for environment variables
 ├── frontend/
 │   ├── app/
-│   │   └── page.tsx       # Main dashboard (auth, profile, chat, recommendations)
+│   │   ├── page.tsx       # Main dashboard
+│   │   ├── chat-assistant/page.tsx
+│   │   ├── ivr-demo/page.tsx
+│   │   └── voice/page.tsx
 │   ├── components/
 │   │   ├── SchemeCard.tsx
-│   │   └── SearchBar.tsx
+│   │   ├── SearchBar.tsx
+│   │   ├── MicButton.tsx
+│   │   └── home/          # Dashboard sections
+│   ├── lib/               # Audio API, hooks, contexts, and i18n
 │   └── next.config.ts     # Proxy rewrites → backend
 ├── dataset/
-│   └── govt_schemes.csv   # 3,400+ government schemes
+│   └── govt_schemes.csv   # 3,400 government schemes
 ├── model/
-│   ├── scheme_index.faiss # FAISS vector index
-│   └── scheme_embeddings.npy
+│   └── scheme_index.faiss # FAISS vector index
 └── README.md
 ```
 
@@ -144,8 +173,8 @@ npm run dev
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/Govt_Scheme_Chatbot.git
-cd Govt_Scheme_Chatbot
+git clone https://github.com/MohamedDadapeer5/Government_Scheme_ChatBot.git
+cd Government_Scheme_ChatBot
 ```
 
 ---
@@ -194,23 +223,48 @@ npm run dev
 
 The app will be available at [http://localhost:3000](http://localhost:3000).
 
+The frontend proxy forwards `/api/*`, `/auth/*`, and `/health` to the backend on port 8000.
+
 ---
 
 ## API Endpoints
 
-| Method | Endpoint               | Description                        |
-| ------ | ---------------------- | ---------------------------------- |
-| `POST` | `/auth/signup`         | Register a new user                |
-| `POST` | `/auth/login`          | Login and receive JWT              |
-| `GET`  | `/auth/me`             | Get current user profile           |
-| `PUT`  | `/auth/profile`        | Update user profile                |
-| `POST` | `/api/search`          | Semantic scheme search             |
-| `POST` | `/api/chat`            | Single-response RAG chat           |
-| `POST` | `/api/chat/stream`     | Streaming RAG chat (SSE)           |
-| `POST` | `/api/find-eligible`   | Find schemes by ad-hoc profile     |
-| `GET`  | `/api/recommendations` | Personalized recommendations (JWT) |
-| `GET`  | `/api/categories`      | Top 15 scheme categories           |
-| `GET`  | `/health`              | Health check                       |
+| Method   | Endpoint                                    | Description                            |
+| -------- | ------------------------------------------- | -------------------------------------- |
+| `POST`   | `/auth/signup`                              | Register a new user                    |
+| `POST`   | `/auth/login`                               | Login and receive JWT                  |
+| `GET`    | `/auth/me`                                  | Get current user profile               |
+| `PUT`    | `/auth/profile`                             | Update user profile                    |
+| `POST`   | `/api/search`                               | Semantic scheme search                 |
+| `POST`   | `/api/chat`                                 | Single-response RAG chat               |
+| `POST`   | `/api/chat/stream`                          | Streaming RAG chat (SSE)               |
+| `POST`   | `/api/find-eligible`                        | Find schemes by ad-hoc profile         |
+| `GET`    | `/api/recommendations`                      | Personalized recommendations (JWT)     |
+| `GET`    | `/api/categories`                           | Top scheme categories                  |
+| `POST`   | `/api/favorites/{scheme_id}`                | Save a scheme (JWT)                    |
+| `GET`    | `/api/favorites`                            | List saved schemes (JWT)               |
+| `DELETE` | `/api/favorites/{scheme_id}`                | Remove a saved scheme (JWT)            |
+| `POST`   | `/api/reminders`                            | Create a reminder                      |
+| `GET`    | `/api/reminders`                            | List reminders                         |
+| `PUT`    | `/api/reminders/{reminder_id}`              | Update a reminder                      |
+| `DELETE` | `/api/reminders/{reminder_id}`              | Delete a reminder                      |
+| `POST`   | `/api/documents`                            | Upload a user document                 |
+| `GET`    | `/api/documents`                            | List uploaded documents                |
+| `GET`    | `/api/documents/{document_id}/download`     | Download a document                    |
+| `DELETE` | `/api/documents/{document_id}`              | Delete a document                      |
+| `POST`   | `/api/profile/photo`                        | Upload profile photo                   |
+| `GET`    | `/api/profile/photo`                        | Get profile photo metadata             |
+| `GET`    | `/api/profile/photo/file`                   | Download profile photo file            |
+| `DELETE` | `/api/profile/photo`                        | Remove profile photo                   |
+| `POST`   | `/api/audio/transcribe`                     | Convert speech to text (Whisper)       |
+| `POST`   | `/api/audio/synthesize`                     | Convert text to speech (gTTS)          |
+| `POST`   | `/api/voice-assistant/chat`                 | Process a voice assistant chat request |
+| `POST`   | `/api/voice-assistant/eligibility-criteria` | Process voice eligibility criteria     |
+| `POST`   | `/api/ivr/translate`                        | Translate text for the IVR demo        |
+| `POST`   | `/api/ivr/speak`                            | Generate IVR speech audio              |
+| `GET`    | `/api/ivr/scheme/demo`                      | Get the IVR demo scheme                |
+| `GET`    | `/api/ivr/languages`                        | List IVR demo languages                |
+| `GET`    | `/health`                                   | Health check                           |
 
 ---
 
@@ -301,6 +355,30 @@ The system detects these keywords and returns only the requested section without
 
 ---
 
+## Voice and IVR Features
+
+### Speech-to-Text
+
+- **Model**: OpenAI Whisper `small`, loaded in CPU mode at backend startup
+- **Endpoint**: `POST /api/audio/transcribe`
+- **Audio processing**: MediaRecorder with echo cancellation, noise suppression, auto-gain control, and a 16 kHz sample rate
+- **Frontend**: Inline microphone control in the search and voice flows
+
+### Text-to-Speech
+
+- **Model**: Google Text-to-Speech (gTTS)
+- **Endpoint**: `POST /api/audio/synthesize`
+- **Languages**: English, Hindi, Telugu, and Tamil, with English fallback
+- **Frontend**: Speaker controls on assistant responses
+
+### Voice Assistant and IVR Demo
+
+- Voice assistant routes support chat and eligibility-criteria requests.
+- The IVR demo provides translation, speech generation, demo scheme data, and supported-language discovery.
+- The UI supports English (`en`), Hindi (`hi`), Telugu (`te`), and Tamil (`ta`).
+
+---
+
 ## Testing
 
 ### Run Backend Tests
@@ -316,7 +394,7 @@ python -m pytest backend/tests/ -v
 python -m pytest backend/tests/ --cov=backend --cov-report=html
 ```
 
-### Test Coverage
+### Chat Test Coverage
 
 The `test_chat_flow.py` file includes **6 comprehensive tests** covering:
 
@@ -328,6 +406,24 @@ The `test_chat_flow.py` file includes **6 comprehensive tests** covering:
 6. **Unrelated Yes** — Ensures yes is treated as normal query when not awaiting follow-up
 
 All tests use monkeypatching for deterministic execution without external API calls.
+
+### Voice Test Coverage
+
+Voice coverage includes transcription and synthesis validation, language mapping, error handling, and end-to-end STT-to-chat-to-TTS flows.
+
+Test files:
+
+- `backend/tests/test_speech.py` — Whisper transcription and error handling
+- `backend/tests/test_voice_e2e.py` — Full voice flow testing
+- `test_voice_flow.py` — Manual integration testing script
+
+Run voice tests:
+
+```powershell
+python -m pytest backend/tests/test_speech.py -v
+python -m pytest backend/tests/test_voice_e2e.py -v
+python test_voice_endpoints.py
+```
 
 ---
 
@@ -506,5 +602,15 @@ Contributions are welcome! To get started:
 ## License
 
 MIT
-#   G o v e r n m e n t _ S c h e m e _ C h a t B o t  
+#   G o v e r n m e n t * S c h e m e * C h a t B o t 
  
+ 
+
+## Recent UI Updates
+
+- The home page acts as a personalized dashboard with recommendations, reminders, documents, and profile controls.
+- The chat assistant is available on the dedicated `/chat-assistant` route.
+- The `/voice` and `/ivr-demo` routes provide the voice assistant and IVR demonstration workflows.
+- Chat labels, search controls, loading states, follow-up prompts, and language selection are localized for all four supported languages.
+
+---

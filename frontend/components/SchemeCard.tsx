@@ -9,6 +9,9 @@ interface Scheme {
   schemeCategory: string;
   tags: string;
   score: number;
+  match_score?: number;
+  recommendation_reasons?: string[];
+  is_favorite?: boolean;
 }
 
 interface Props {

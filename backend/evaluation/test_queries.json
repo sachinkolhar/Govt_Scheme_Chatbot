@@ -1,0 +1,322 @@
+[
+  {
+    "query": "PM Kisan benefits and eligibility",
+    "expected_scheme": "PM-KISAN",
+    "expected_match": true
+  },
+  {
+    "query": "agricultural support scheme",
+    "expected_scheme": "PM-KISAN",
+    "expected_match": true
+  },
+  {
+    "query": "farmer income support",
+    "expected_scheme": "PM-KISAN",
+    "expected_match": true
+  },
+  {
+    "query": "driving license renewal process",
+    "expected_scheme": null,
+    "expected_match": false
+  },
+  {
+    "query": "passport application help",
+    "expected_scheme": null,
+    "expected_match": false
+  },
+  {
+    "query": "student loan assistance",
+    "expected_scheme": null,
+    "expected_match": false
+  },
+  {
+    "query": "senior citizen pension scheme",
+    "expected_scheme": "Indira Gandhi National Old Age Pension Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "old age pension benefits",
+    "expected_scheme": "Indira Gandhi National Old Age Pension Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "pension for elderly citizens",
+    "expected_scheme": "Indira Gandhi National Old Age Pension Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "health insurance for poor",
+    "expected_scheme": "Pradhan Mantri Jan Arogya Yojana",
+    "expected_match": true
+  },
+  {
+    "query": "ayushman bharat scheme",
+    "expected_scheme": "Pradhan Mantri Jan Arogya Yojana",
+    "expected_match": true
+  },
+  {
+    "query": "medical coverage government",
+    "expected_scheme": "Pradhan Mantri Jan Arogya Yojana",
+    "expected_match": true
+  },
+  {
+    "query": "house building loan schemes",
+    "expected_scheme": "Pradhan Mantri Awas Yojana",
+    "expected_match": true
+  },
+  {
+    "query": "affordable housing scheme",
+    "expected_scheme": "Pradhan Mantri Awas Yojana",
+    "expected_match": true
+  },
+  {
+    "query": "home construction assistance",
+    "expected_scheme": "Pradhan Mantri Awas Yojana",
+    "expected_match": true
+  },
+  {
+    "query": "girl child education support",
+    "expected_scheme": "Sukanya Samriddhi Yojana",
+    "expected_match": true
+  },
+  {
+    "query": "savings scheme for daughters",
+    "expected_scheme": "Sukanya Samriddhi Yojana",
+    "expected_match": true
+  },
+  {
+    "query": "female child financial security",
+    "expected_scheme": "Sukanya Samriddhi Yojana",
+    "expected_match": true
+  },
+  {
+    "query": "small business startup funding",
+    "expected_scheme": "Prime Minister Employment Generation Programme",
+    "expected_match": true
+  },
+  {
+    "query": "entrepreneurship loan scheme",
+    "expected_scheme": "Prime Minister Employment Generation Programme",
+    "expected_match": true
+  },
+  {
+    "query": "self employment assistance",
+    "expected_scheme": "Prime Minister Employment Generation Programme",
+    "expected_match": true
+  },
+  {
+    "query": "widow pension eligibility",
+    "expected_scheme": "Indira Gandhi National Widow Pension Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "financial support widows",
+    "expected_scheme": "Indira Gandhi National Widow Pension Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "widow assistance government",
+    "expected_scheme": "Indira Gandhi National Widow Pension Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "cricket tournament registration",
+    "expected_scheme": null,
+    "expected_match": false
+  },
+  {
+    "query": "cooking class fees",
+    "expected_scheme": null,
+    "expected_match": false
+  },
+  {
+    "query": "movie ticket discount",
+    "expected_scheme": null,
+    "expected_match": false
+  },
+  {
+    "query": "disability pension scheme",
+    "expected_scheme": "Indira Gandhi National Disability Pension Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "support for disabled persons",
+    "expected_scheme": "Indira Gandhi National Disability Pension Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "benefits for people with disabilities",
+    "expected_scheme": "Indira Gandhi National Disability Pension Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "skill development training programs",
+    "expected_scheme": "Pradhan Mantri Kaushal Vikas Yojana",
+    "expected_match": true
+  },
+  {
+    "query": "vocational training scheme",
+    "expected_scheme": "Pradhan Mantri Kaushal Vikas Yojana",
+    "expected_match": true
+  },
+  {
+    "query": "job training government initiative",
+    "expected_scheme": "Pradhan Mantri Kaushal Vikas Yojana",
+    "expected_match": true
+  },
+  {
+    "query": "labor welfare benefits schemes",
+    "expected_scheme": "Building and Construction Workers Welfare Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "worker protection government",
+    "expected_scheme": "Building and Construction Workers Welfare Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "occupational safety assistance",
+    "expected_scheme": "Building and Construction Workers Welfare Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "restaurant business plan",
+    "expected_scheme": null,
+    "expected_match": false
+  },
+  {
+    "query": "wedding invitation printing",
+    "expected_scheme": null,
+    "expected_match": false
+  },
+  {
+    "query": "furniture shopping guide",
+    "expected_scheme": null,
+    "expected_match": false
+  },
+  {
+    "query": "maternity benefit scheme",
+    "expected_scheme": "Pradhan Mantri Maternity Benefit Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "pregnant women financial assistance",
+    "expected_scheme": "Pradhan Mantri Maternity Benefit Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "mother and child support",
+    "expected_scheme": "Pradhan Mantri Maternity Benefit Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "social security for workers",
+    "expected_scheme": "Building and Construction Workers Welfare Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "unorganized sector workers benefits",
+    "expected_scheme": "Building and Construction Workers Welfare Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "fishermen welfare schemes",
+    "expected_scheme": "Welfare and Relief for Fishermen Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "fishing industry support government",
+    "expected_scheme": "Welfare and Relief for Fishermen Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "marine resources assistance",
+    "expected_scheme": "Welfare and Relief for Fishermen Scheme",
+    "expected_match": true
+  },
+  {
+    "query": "car purchase subsidy",
+    "expected_scheme": null,
+    "expected_match": false
+  },
+  {
+    "query": "travel agency registration",
+    "expected_scheme": null,
+    "expected_match": false
+  },
+  {
+    "query": "food delivery business",
+    "expected_scheme": null,
+    "expected_match": false
+  },
+  {
+    "query": "micro finance for women",
+    "expected_scheme": "Pradhan Mantri Mahila Shakti Kendra",
+    "expected_match": true
+  },
+  {
+    "query": "women entrepreneurship support",
+    "expected_scheme": "Pradhan Mantri Mahila Shakti Kendra",
+    "expected_match": true
+  },
+  {
+    "query": "female business loan",
+    "expected_scheme": "Pradhan Mantri Mahila Shakti Kendra",
+    "expected_match": true
+  },
+  {
+    "query": "education loan for college",
+    "expected_scheme": "Central Sector Scheme of Scholarship for College and University Students",
+    "expected_match": true
+  },
+  {
+    "query": "student financial aid government",
+    "expected_scheme": "Central Sector Scheme of Scholarship for College and University Students",
+    "expected_match": true
+  },
+  {
+    "query": "higher education assistance",
+    "expected_scheme": "Central Sector Scheme of Scholarship for College and University Students",
+    "expected_match": true
+  },
+  {
+    "query": "how to make biryani",
+    "expected_scheme": null,
+    "expected_match": false
+  },
+  {
+    "query": "yoga teacher certification",
+    "expected_scheme": null,
+    "expected_match": false
+  },
+  {
+    "query": "gym membership deals",
+    "expected_scheme": null,
+    "expected_match": false
+  },
+  {
+    "query": "SC ST scholarship scheme",
+    "expected_scheme": "Central Sector Scheme of Scholarship for College and University Students",
+    "expected_match": true
+  },
+  {
+    "query": "reserved category student benefits",
+    "expected_scheme": "Central Sector Scheme of Scholarship for College and University Students",
+    "expected_match": true
+  },
+  {
+    "query": "caste based assistance education",
+    "expected_scheme": "Central Sector Scheme of Scholarship for College and University Students",
+    "expected_match": true
+  },
+  {
+    "query": "apprenticeship training schemes",
+    "expected_scheme": "Pradhan Mantri Kaushal Vikas Yojana",
+    "expected_match": true
+  },
+  {
+    "query": "technical education support",
+    "expected_scheme": "Pradhan Mantri Kaushal Vikas Yojana",
+    "expected_match": true
+  }
+]

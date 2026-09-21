@@ -1,0 +1,25 @@
+# FAISS Threshold Evaluation Pipeline Requirements
+# Install with: pip install -r evaluation_requirements.txt
+
+# Data processing
+pandas>=1.5.0
+numpy>=1.23.0
+
+# Visualization
+matplotlib>=3.5.0
+seaborn>=0.12.0
+
+# Scientific computing
+scikit-learn>=1.2.0
+
+# Vector search (choose one)
+# For CPU: pip install faiss-cpu
+# For GPU: pip install faiss-gpu
+# Usually already installed by backend
+
+# Model serialization
+# Usually already installed by backend
+joblib>=1.2.0
+
+# Optional: For performance profiling
+# psutil>=5.9.0
