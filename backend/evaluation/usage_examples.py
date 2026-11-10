@@ -1,8 +1,9 @@
 """
 Usage Examples for FAISS Evaluation Pipeline
 
-This script demonstrates how to use the evaluation pipeline
-in various scenarios.
+This script demonstrates the legacy evaluation pipeline in various scenarios.
+Its score-based threshold examples are provisional diagnostics only and are not
+current IndexFlatL2 calibration or production configuration.
 """
 
 import os
@@ -38,7 +39,7 @@ from pathlib import Path
 
 
 def example_1_basic_usage():
-    """Example 1: Basic single-threshold evaluation."""
+    """Legacy single-threshold diagnostic example."""
     print("\n" + "=" * 80)
     print("EXAMPLE 1: Single Threshold Evaluation")
     print("=" * 80)
@@ -78,7 +79,7 @@ def example_1_basic_usage():
 
 
 def example_2_custom_range():
-    """Example 2: Test custom threshold range."""
+    """Legacy custom-range diagnostic example."""
     print("\n" + "=" * 80)
     print("EXAMPLE 2: Custom Threshold Range")
     print("=" * 80)
@@ -111,9 +112,7 @@ def example_2_custom_range():
         metrics_list.append(metrics)
         print(f"  F1: {metrics.f1_score:.4f}")
     
-    # Find best
-    best = max(metrics_list, key=lambda m: m.f1_score)
-    print(f"\n✓ Best threshold: {best.threshold:.2f} (F1: {best.f1_score:.4f})")
+    print("\nLegacy diagnostic sweep complete; no cutoff is selected.")
 
 
 def example_3_programmatic_integration():
@@ -143,21 +142,21 @@ def example_3_programmatic_integration():
     results = semantic_search(test_query, encoder, faiss_index, df, top_k=5)
     
     print(f"\nSearch results for: '{test_query}'")
-    print(f"{'Rank':<6} {'Scheme':<50} {'Score':<8}")
+    print(f"{'Rank':<6} {'Scheme':<50} {'Distance':<8}")
     print("-" * 80)
     for rank, (scheme, score) in enumerate(results, 1):
         print(f"{rank:<6} {scheme:<50} {score:<8.4f}")
     
-    # Apply threshold logic
-    threshold = 0.35
-    if results[0][1] >= threshold:
-        print(f"\n✓ Match accepted (score {results[0][1]:.4f} >= threshold {threshold})")
+    # Current runtime semantics: raw squared L2 distance, lower is closer.
+    max_distance = None
+    if max_distance is None or results[0][1] <= max_distance:
+        print("\n✓ Candidate passes optional maximum-distance cutoff")
     else:
-        print(f"\n✗ Match rejected (score {results[0][1]:.4f} < threshold {threshold})")
+        print("\n✗ Candidate exceeds optional maximum-distance cutoff")
 
 
 def example_4_batch_evaluation():
-    """Example 4: Batch process multiple queries."""
+    """Legacy batch diagnostic example."""
     print("\n" + "=" * 80)
     print("EXAMPLE 4: Batch Evaluation")
     print("=" * 80)
@@ -203,7 +202,7 @@ def example_4_batch_evaluation():
 
 
 def example_5_export_and_plot():
-    """Example 5: Export results and generate plots."""
+    """Legacy diagnostic export example."""
     print("\n" + "=" * 80)
     print("EXAMPLE 5: Export & Visualization")
     print("=" * 80)
@@ -254,7 +253,7 @@ def example_5_export_and_plot():
 
 
 def example_6_custom_test_set():
-    """Example 6: Create and evaluate custom test set."""
+    """Legacy custom-test diagnostic example."""
     print("\n" + "=" * 80)
     print("EXAMPLE 6: Custom Test Set")
     print("=" * 80)

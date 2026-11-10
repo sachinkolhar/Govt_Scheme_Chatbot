@@ -1,0 +1,65 @@
+query_number,query,expected_scheme,expected_match,matched_scheme,top_distance,second_distance
+1,PM Kisan benefits and eligibility,PM-KISAN,True,Kisan Pension Yojana,0.7566418051719666,0.844691276550293
+2,agricultural support scheme,PM-KISAN,True,Promoting to Farmer for Post Harvesting & Management (Value Addition),0.6905543804168701,0.693976640701294
+3,farmer income support,PM-KISAN,True,Scheme of Providing Assistance to Encourage Farmers for Adoption of Organic Farming,0.740477442741394,0.7805011868476868
+4,driving license renewal process,,False,Motorized Tricycle Yojana,1.4274485111236572,1.4558961391448975
+5,passport application help,,False,Free Passport Scheme,0.7686970829963684,1.2097457647323608
+6,student loan assistance,,False,Overseas Educational Loan Scheme,0.8560985326766968,0.9111722707748413
+7,senior citizen pension scheme,Indira Gandhi National Old Age Pension Scheme,True,Pension Scheme to Old Age Persons (Senior Citizen),0.5186753273010254,0.5584547519683838
+8,old age pension benefits,Indira Gandhi National Old Age Pension Scheme,True,Old Age Pension Scheme,0.6521953344345093,0.7112922072410583
+9,pension for elderly citizens,Indira Gandhi National Old Age Pension Scheme,True,Old Age Pension Scheme,0.6817312240600586,0.6945587396621704
+10,health insurance for poor,Pradhan Mantri Jan Arogya Yojana,True,Chief Minister’s Comprehensive Health Insurance Scheme - Tamil Nadu,1.1493747234344482,1.1576260328292847
+11,ayushman bharat scheme,Pradhan Mantri Jan Arogya Yojana,True,Aahar Anudan Yojana,0.8693874478340149,0.9243625402450562
+12,medical coverage government,Pradhan Mantri Jan Arogya Yojana,True,Chief Minister's Comprehensive Health Insurance Scheme,0.9173259735107422,0.9327926635742188
+13,house building loan schemes,Pradhan Mantri Awas Yojana,True,Loans and Advances for Construction of a House,0.8657761812210083,0.8721721172332764
+14,affordable housing scheme,Pradhan Mantri Awas Yojana,True,Pradhan Mantri Awas Yojana - Urban,0.912499725818634,0.9178152084350586
+15,home construction assistance,Pradhan Mantri Awas Yojana,True,Mukhyamantri Nirman Shramik Awas Sahayata Yojana,0.9012888669967651,0.9126328229904175
+16,girl child education support,Sukanya Samriddhi Yojana,True,Education Development Scholarship for Single Girl Child,0.7086122035980225,0.7450481057167053
+17,savings scheme for daughters,Sukanya Samriddhi Yojana,True,Grant of Financial Assistance to the Poor Parents Having Only One Girl Child Who is Studying 8th to 10th Standard,0.8581625819206238,0.9457393288612366
+18,female child financial security,Sukanya Samriddhi Yojana,True,Grant of Financial Assistance to the Poor Parents Having Only One Girl Child Who is Studying 8th to 10th Standard,0.7615898847579956,0.8355422019958496
+19,small business startup funding,Prime Minister Employment Generation Programme,True,Spurring Entrepreneurship Initiative,1.0445895195007324,1.0584664344787598
+20,entrepreneurship loan scheme,Prime Minister Employment Generation Programme,True,Spurring Entrepreneurship Initiative,0.7675201892852783,0.7837240099906921
+21,self employment assistance,Prime Minister Employment Generation Programme,True,Women Self Employment Scheme,0.7992181181907654,0.8750344514846802
+22,widow pension eligibility,Indira Gandhi National Widow Pension Scheme,True,Widow Pension-West Bengal,0.6394362449645996,0.6684665083885193
+23,financial support widows,Indira Gandhi National Widow Pension Scheme,True,Widow Pension - Uttar Pradesh,0.7978026866912842,0.8250664472579956
+24,widow assistance government,Indira Gandhi National Widow Pension Scheme,True,Widow Pension-West Bengal,0.5916756391525269,0.6101691722869873
+25,cricket tournament registration,,False,Financial Grant for Sports Associations,1.1720032691955566,1.1798452138900757
+26,cooking class fees,,False,"Free Education Scholarship for Professional Courses (Engineering, Medical, Agriculture, Veterinary, and Law)",1.2296152114868164,1.2661287784576416
+27,movie ticket discount,,False,Sanction of Laptops - Andhra Pradesh,1.52047598361969,1.526491641998291
+28,disability pension scheme,Indira Gandhi National Disability Pension Scheme,True,Leprosy Pension Scheme,0.6222690343856812,0.6454290747642517
+29,support for disabled persons,Indira Gandhi National Disability Pension Scheme,True,Maintenance Allowance to Intellectually Disabled Persons,0.6620701551437378,0.7115893959999084
+30,benefits for people with disabilities,Indira Gandhi National Disability Pension Scheme,True,Maintenance Allowance to Intellectually Disabled Persons,0.8460489511489868,0.9081729650497437
+31,skill development training programs,Pradhan Mantri Kaushal Vikas Yojana,True,Skill Development Training Manipur,0.7547568082809448,0.7950038909912109
+32,vocational training scheme,Pradhan Mantri Kaushal Vikas Yojana,True,Vocational Education and Training Loan Scheme,0.6286783218383789,0.6296797394752502
+33,job training government initiative,Pradhan Mantri Kaushal Vikas Yojana,True,15 Days Skill Up-gradation Training,0.7942084074020386,0.810226559638977
+34,labor welfare benefits schemes,Building and Construction Workers Welfare Scheme,True,Maternity Benefit Scheme (APB&OCWWB),0.8139022588729858,0.8246210813522339
+35,worker protection government,Building and Construction Workers Welfare Scheme,True,Self-Certification Scheme,0.8056243658065796,0.9589307308197021
+36,occupational safety assistance,Building and Construction Workers Welfare Scheme,True,Assistance for Purchase of Safety Equipment (O.B.O.C.W.W.B),0.8282437324523926,0.9760892391204834
+37,restaurant business plan,,False,Pradhan Mantri Formalisation Of Micro Food Processing Enterprises,1.244386076927185,1.3104755878448486
+38,wedding invitation printing,,False,Mukyamantri Samuhik Vivah Evam Anudan Yojna,1.361319899559021,1.3991543054580688
+39,furniture shopping guide,,False,Investment Promotion Scheme (IPS) for Thrust Sectors: Assistance For Furniture Sector,1.2879586219787598,1.3722832202911377
+40,maternity benefit scheme,Pradhan Mantri Maternity Benefit Scheme,True,Maternity Benefit to the Female Beneficiary,0.5097274780273438,0.5244177579879761
+41,pregnant women financial assistance,Pradhan Mantri Maternity Benefit Scheme,True,Grant of Financial Assistance to Poor Scheduled Caste Pregnant & Lactating Women,0.7368900179862976,0.7399537563323975
+42,mother and child support,Pradhan Mantri Maternity Benefit Scheme,True,Financial Assistance To Dependent Children Of Widows And Destitute Women,0.9699035882949829,1.0406575202941895
+43,social security for workers,Building and Construction Workers Welfare Scheme,True,Contributory Social Security Scheme,0.9198041558265686,0.9277539253234863
+44,unorganized sector workers benefits,Building and Construction Workers Welfare Scheme,True,Payroll Subsidy,0.974429190158844,0.9912358522415161
+45,fishermen welfare schemes,Welfare and Relief for Fishermen Scheme,True,"""Immediate Relief Assistance"" under ""Welfare and Relief for Fishermen During Lean Seasons and Natural Calamities Scheme""",0.7464377880096436,0.7535727024078369
+46,fishing industry support government,Welfare and Relief for Fishermen Scheme,True,Khule Jalsroto Mei Pen Aadharit Matsya Paalan ki Yojana,0.7526075839996338,0.8273906111717224
+47,marine resources assistance,Welfare and Relief for Fishermen Scheme,True,Financial Assistance to Mussel Culture and Oyster Farming in Goa,0.9323204755783081,1.0047743320465088
+48,car purchase subsidy,,False,Grant of Fuel Subsidy to Differently Abled Persons Who Are Owning Motorised Vehicles,1.0433025360107422,1.1741454601287842
+49,travel agency registration,,False,Annual Tour to the Differently Abled Persons,1.2826244831085205,1.3313028812408447
+50,food delivery business,,False,Distribution of Vegetable Seeds Minikit & Fruits Minikit at Free of Cost,1.1505876779556274,1.1625592708587646
+51,micro finance for women,Pradhan Mantri Mahila Shakti Kendra,True,Micro Credit Finance,1.0392473936080933,1.0515490770339966
+52,women entrepreneurship support,Pradhan Mantri Mahila Shakti Kendra,True,"Incentives to Women Entrepreneurs Scheme, 2008",0.789470911026001,0.890457808971405
+53,female business loan,Pradhan Mantri Mahila Shakti Kendra,True,Soft Loan Scheme for Women Entrepreneurs,0.7627807855606079,0.8771698474884033
+54,education loan for college,Central Sector Scheme of Scholarship for College and University Students,True,Foreign Education Scheme,0.9402571320533752,0.9467528462409973
+55,student financial aid government,Central Sector Scheme of Scholarship for College and University Students,True,General Pre Matric Scholarship-Uttar Pradesh,0.8231555223464966,0.831400990486145
+56,higher education assistance,Central Sector Scheme of Scholarship for College and University Students,True,General Pre Matric Scholarship-Uttar Pradesh,0.7936685085296631,0.7962377071380615
+57,how to make biryani,,False,Bima Yojana - Direct Benefit to Artisan,1.4490817785263062,1.4540516138076782
+58,yoga teacher certification,,False,Mukhyamantri Yuba Yogajog Yojana In Tripura,1.1105310916900635,1.1516759395599365
+59,gym membership deals,,False,Pay & Play Scheme,1.3204455375671387,1.3987500667572021
+60,SC ST scholarship scheme,Central Sector Scheme of Scholarship for College and University Students,True,Savitribai Phule Scholarship For V.J.N.T And S.B.C Girls Students Studying In 8th To 10 Std,0.6906114816665649,0.6930475234985352
+61,reserved category student benefits,Central Sector Scheme of Scholarship for College and University Students,True,Student Housing Scheme for Students with Disabilities,1.028232216835022,1.0343049764633179
+62,caste based assistance education,Central Sector Scheme of Scholarship for College and University Students,True,"Coaching Assistance Scheme For Scheduled Caste Students For Pre-Exam Preparation Like NEET, JEE, GUJCET",0.7915939092636108,0.8052021265029907
+63,apprenticeship training schemes,Pradhan Mantri Kaushal Vikas Yojana,True,National Apprenticeship Promotion Scheme-2,0.7608168721199036,0.7642263174057007
+64,technical education support,Pradhan Mantri Kaushal Vikas Yojana,True,AICTE-ISTE INDUCTION/REFRESHER PROGRAMME SCHEME,0.8906442523002625,0.8918326497077942

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import SchemeCard from "@/components/SchemeCard";
+import ChatSources from "@/components/home/ChatSources";
 import { useAuthSession } from "@/lib/useAuthSession";
 import { chatI18n, languageNames } from "@/lib/i18n/chat";
 import type { ChatMessage, LanguageCode } from "@/lib/types/chat";
@@ -147,6 +148,12 @@ export default function ChatAssistantPage() {
               setMessages((prev) =>
                 prev.map((m) =>
                   m.id === assistantMsgId ? { ...m, relevantSchemes } : m,
+                ),
+              );
+            } else if (event.type === "sources" && Array.isArray(event.data)) {
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsgId ? { ...m, sources: event.data } : m,
                 ),
               );
             } else if (event.type === "error" && event.text) {
@@ -304,6 +311,7 @@ export default function ChatAssistantPage() {
                       {msg.error && (
                         <p className="text-red-500 text-xs mt-2">{msg.error}</p>
                       )}
+                      <ChatSources sources={msg.sources} />
                       {msg.scheme && (
                         <div className="mt-3">
                           <SchemeCard scheme={msg.scheme} />

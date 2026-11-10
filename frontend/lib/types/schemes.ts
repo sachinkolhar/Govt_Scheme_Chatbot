@@ -12,6 +12,10 @@ export interface Scheme {
   match_score?: number; // 0-100 percentage
   recommendation_reasons?: string[]; // Why this scheme is recommended
   is_favorite?: boolean; // Whether user has favorited this scheme
+  source_title?: string | null;
+  source_url?: string | null;
+  source_type?: string | null;
+  retrieved_at?: string | null;
 }
 
 export interface CategorySummary {

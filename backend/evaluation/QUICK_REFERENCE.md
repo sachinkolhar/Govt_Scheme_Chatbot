@@ -36,22 +36,23 @@ cat backend/evaluation/results/evaluation_summary.csv
 
 ## 📊 Key Outputs
 
-| File                              | Purpose                 | How to Use                    |
-| --------------------------------- | ----------------------- | ----------------------------- |
-| `evaluation_summary.csv`          | Metrics per threshold   | Find **highest F1 score** row |
-| `evaluation_results_detailed.csv` | Per-query results       | Debug wrong matches           |
-| `ambiguous_matches.csv`           | Close calls (<0.05 gap) | Manual review edge cases      |
-| `threshold_comparison.png`        | 4-panel visualization   | See trends visually           |
+| File                              | Purpose                   | How to Use                           |
+| --------------------------------- | ------------------------- | ------------------------------------ |
+| `evaluation_summary.csv`          | Legacy diagnostic metrics | Review only; not current calibration |
+| `evaluation_results_detailed.csv` | Per-query results         | Debug wrong matches                  |
+| `ambiguous_matches.csv`           | Close calls (<0.05 gap)   | Manual review edge cases             |
+| `threshold_comparison.png`        | 4-panel visualization     | See trends visually                  |
 
 ## 🎯 Quick Steps to Implement
 
 1. **Run evaluation** → `python run_evaluation.py`
 2. **Check results** → Open `evaluation_summary.csv`
-3. **Find best threshold** → Row with max **F1 Score**
-4. **Update chatbot** → Edit `backend/config/settings.py`
-5. **Change this line:**
+3. **Review the provisional legacy metrics** → Do not treat them as calibration
+4. **Set a validated maximum distance** → Edit `backend/config/settings.py`
+5. **Use this optional setting:**
    ```python
-   FAISS_MIN_SCORE = float(os.getenv("FAISS_MIN_SCORE", "0.35"))
+    raw_distance = os.getenv("FAISS_MAX_DISTANCE")
+    FAISS_MAX_DISTANCE = float(raw_distance) if raw_distance else None
    ```
 6. **Restart backend** → `python backend/main.py`
 7. **Test manually** → Use queries from `test_queries.json`
@@ -61,15 +62,16 @@ cat backend/evaluation/results/evaluation_summary.csv
 - **Accuracy** = Overall correctness
 - **Precision** = Accuracy of matches suggested (minimize false positives)
 - **Recall** = Percentage of actual matches found (minimize false negatives)
-- **F1 Score** = Balance between precision & recall ⭐ **USE THIS**
+- **F1 Score** = Balance between precision & recall; legacy output is provisional
 
 ## 🎚️ Threshold Tuning
 
-**Too many wrong suggestions?** → Raise threshold (0.35 → 0.45)
+**Too many wrong suggestions?** → Recalibrate the squared-L2 cutoff against reviewed labels
 
-**Too many "not found"?** → Lower threshold (0.35 → 0.25)
+**Too many "not found"?** → Recalibrate the squared-L2 cutoff against reviewed labels
 
-**Not sure?** → Use highest F1 score threshold
+**Not sure?** → Do not choose from historical output. Use reviewed labels and a
+documented validation procedure.
 
 ## 🔧 Integrate into Your Code
 
@@ -79,8 +81,10 @@ from evaluation_pipeline import semantic_search
 # Search
 results = semantic_search(query, encoder, faiss_index, df)
 
-# Apply threshold
-if results[0][1] >= 0.35:  # Your best threshold
+# Apply the optional maximum squared-L2 distance cutoff.
+# IndexFlatL2 returns raw squared L2 distances; lower is closer.
+FAISS_MAX_DISTANCE = None  # Uncalibrated until validated.
+if FAISS_MAX_DISTANCE is None or results[0][1] <= FAISS_MAX_DISTANCE:
     scheme = results[0][0]
 else:
     scheme = None
@@ -88,12 +92,11 @@ else:
 
 ## ✅ Verification Checklist
 
-Before deploying new threshold:
+Before deploying a new optional maximum-distance cutoff:
 
 - [ ] Evaluation completed without errors
-- [ ] F1 score looks good (0.90+)
-- [ ] False positives are reasonable (<3)
-- [ ] False negatives are reasonable (<3)
+- [ ] Reviewed labels are complete for the intended evaluation population
+- [ ] Validation procedure and selection rule are documented
 - [ ] Ambiguous matches understood
 - [ ] settings.py updated
 - [ ] Backend restarted
@@ -117,15 +120,14 @@ Before deploying new threshold:
 - **Code Examples** → `usage_examples.py`
 - **Source Code** → `evaluation_pipeline.py` (well-commented)
 
-## 🎓 Key Numbers for Your Chatbot
+## 🎓 Current Runtime Notes
 
-**Recommended thresholds:**
-
-- Conservative (fewer wrong suggestions): **0.40-0.50**
-- Balanced (good precision & recall): **0.30-0.40** ⭐
-- Lenient (fewer "not found"): **0.20-0.30**
-
-**Start with 0.35** and adjust based on results.
+- `FAISS_MAX_DISTANCE` is optional and currently uncalibrated.
+- A cutoff must not be selected from historical examples or fixed metric targets.
+- Semantic relevance is separate from the numeric distance cutoff.
+- FAISS index-to-dataset row alignment remains unverified; equal counts do not
+  prove row-order alignment.
+- The current query file contains 64 queries.
 
 ## 💾 Saving Your Work
 
@@ -133,7 +135,7 @@ Before deploying new threshold:
 # After evaluation
 git add backend/evaluation/results/
 git add backend/config/settings.py
-git commit -m "Evaluation complete: Best threshold=0.35 (F1=0.92)"
+git commit -m "Record provisional FAISS L2 evaluation diagnostics"
 ```
 
 ---

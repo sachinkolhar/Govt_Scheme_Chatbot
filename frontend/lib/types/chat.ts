@@ -4,7 +4,15 @@ export type LanguageCode = "en" | "hi" | "te" | "ta";
 export type ChatResponseType =
   | "direct_answer"
   | "no_data_prompt"
-  | "relevant_schemes";
+  | "relevant_schemes"
+  | "clarification";
+
+export interface ChatSource {
+  title: string;
+  url: string;
+  source_type: string;
+  retrieved_at?: string | null;
+}
 
 export interface ConversationMessage {
   role: "user" | "assistant";
@@ -25,6 +33,7 @@ export interface ChatResponse {
   response_type: ChatResponseType;
   source_scheme: Scheme | null;
   relevant_schemes: Scheme[];
+  sources?: ChatSource[];
 }
 
 export interface ChatMessage {
@@ -36,6 +45,7 @@ export interface ChatMessage {
   responseType?: ChatResponseType;
   streaming?: boolean;
   error?: string;
+  sources?: ChatSource[];
 }
 
 export type ChatStreamEvent =
@@ -43,5 +53,6 @@ export type ChatStreamEvent =
   | { type: "token"; text: string }
   | { type: "scheme"; data: Scheme }
   | { type: "relevant_schemes"; data: Scheme[] }
+  | { type: "sources"; data: ChatSource[] }
   | { type: "error"; text: string }
   | { type: "done" };

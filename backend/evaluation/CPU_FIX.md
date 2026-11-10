@@ -204,16 +204,10 @@ CPU-only evaluation will be slower than GPU:
 
 ### Speed Tips
 
-1. Reduce threshold range:
-
-   ```python
-   THRESHOLDS_TO_TEST = [0.3, 0.4, 0.5]  # Instead of [0.2, 0.3, 0.4, 0.5, 0.6]
-   ```
-
-2. Reduce test queries:
+1. Reduce test queries:
    - Create subset of `test_queries.json` for quick testing
 
-3. Use GPU if available:
+2. Use GPU if available:
    - Install `faiss-gpu` and `torch` with CUDA support
    - Remove CPU forcing to use GPU
 
@@ -236,7 +230,7 @@ CPU-only evaluation will be slower than GPU:
 ## Related Files
 
 - `backend/main.py` - Original CPU setup approach (we adapted this)
-- `backend/config/settings.py` - FAISS_MIN_SCORE configuration
+- `backend/config/settings.py` - optional FAISS_MAX_DISTANCE configuration
 - `backend/search/semantic.py` - Semantic search functions
 
 ## Next Steps

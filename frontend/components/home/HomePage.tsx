@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import SchemeCard from "@/components/SchemeCard";
+import ChatSources from "@/components/home/ChatSources";
 import WelcomeBanner from "@/components/home/WelcomeBanner";
 import RemindersSection from "@/components/home/RemindersSection";
 import DocumentsSection from "@/components/home/DocumentsSection";
@@ -12,6 +13,10 @@ import { AppUserProfile, useAuthSession } from "@/lib/useAuthSession";
 import { chatI18n, languageNames } from "@/lib/i18n/chat";
 import type { ChatMessage, LanguageCode } from "@/lib/types/chat";
 import type { CategorySummary, Scheme } from "@/lib/types/schemes";
+import {
+  appendStreamToken,
+  getDistinctRelevantSchemes,
+} from "@/lib/chat/display";
 
 interface AuthResponse {
   access_token: string;
@@ -489,16 +494,11 @@ export default function Home() {
     setChatLoading(true);
 
     try {
-      const queryForBackend =
-        chatLanguage !== "en"
-          ? `Please answer in ${languageNames[chatLanguage]}. Question: ${q}`
-          : q;
-
       const res = await fetch("/api/chat/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          query: queryForBackend,
+          query: q,
           top_k: 5,
           history: historyForApi,
           conversation_id: conversationIdRef.current,
@@ -547,11 +547,29 @@ export default function Home() {
               value?: "direct_answer" | "no_data_prompt" | "relevant_schemes";
               data_list?: Scheme[];
             };
+            if (event.type === "token") {
+              console.log(
+                "[CHAT DEBUG] Raw SSE token:",
+                JSON.stringify(event.text),
+              );
+            }
             if (event.type === "token" && event.text) {
               setMessages((prev) =>
                 prev.map((m) =>
                   m.id === assistantMsgId
-                    ? { ...m, content: m.content + event.text }
+                    ? (() => {
+                        const nextContent = appendStreamToken(
+                          m.content,
+                          event.text ?? "",
+                        );
+
+                        console.log(
+                          "[CHAT DEBUG] Assembled answer:",
+                          nextContent,
+                        );
+
+                        return { ...m, content: nextContent };
+                      })()
                     : m,
                 ),
               );
@@ -585,6 +603,14 @@ export default function Home() {
               setMessages((prev) =>
                 prev.map((m) =>
                   m.id === assistantMsgId ? { ...m, relevantSchemes } : m,
+                ),
+              );
+            } else if (event.type === "sources" && Array.isArray(event.data)) {
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsgId
+                    ? { ...m, sources: event.data as any }
+                    : m,
                 ),
               );
             } else if (event.type === "error" && event.text) {
@@ -1160,22 +1186,28 @@ export default function Home() {
                       {msg.error && (
                         <p className="text-red-500 text-xs mt-2">{msg.error}</p>
                       )}
+                      <ChatSources sources={msg.sources} />
                       {msg.scheme && (
                         <div className="mt-3">
                           <SchemeCard scheme={msg.scheme} />
                         </div>
                       )}
-                      {msg.relevantSchemes &&
-                        msg.relevantSchemes.length > 0 && (
-                          <div className="mt-3 space-y-3">
-                            {msg.relevantSchemes.map((scheme, i) => (
-                              <SchemeCard
-                                key={`${msg.id}-rel-${i}`}
-                                scheme={scheme}
-                              />
-                            ))}
-                          </div>
-                        )}
+                      {getDistinctRelevantSchemes(
+                        msg.scheme,
+                        msg.relevantSchemes,
+                      ).length > 0 && (
+                        <div className="mt-3 space-y-3">
+                          {getDistinctRelevantSchemes(
+                            msg.scheme,
+                            msg.relevantSchemes,
+                          ).map((scheme, i) => (
+                            <SchemeCard
+                              key={`${msg.id}-rel-${i}`}
+                              scheme={scheme}
+                            />
+                          ))}
+                        </div>
+                      )}
                     </>
                   )}
                 </div>

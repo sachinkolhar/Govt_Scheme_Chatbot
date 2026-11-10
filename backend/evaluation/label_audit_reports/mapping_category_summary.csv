@@ -1,0 +1,5 @@
+mapping_category,query_count,automatic_approval,decision_rule
+exact_mapping,9,False,Exact scheme_name or slug exists; still preserve review trail
+explicit_canonical_mapping_required,0,False,One traceable candidate exists; explicit human canonical mapping required
+multiple_candidate_review_required,40,False,Two or more traceable candidates exist; choose only with source evidence
+remove_from_evaluation_missing_ground_truth,0,False,No traceable ground-truth record exists; exclude unless labels are repaired

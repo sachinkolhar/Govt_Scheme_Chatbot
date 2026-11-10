@@ -1,0 +1,47 @@
+{
+  "results_csv": "backend\\evaluation\\results_rebuild\\faiss_csv_diagnostic_results.csv",
+  "source_files_and_functions": {
+    "production_loader": "backend/main.py module initialization",
+    "production_search": "backend/search/semantic.py:semantic_candidates",
+    "production_mapping": "backend/search/semantic.py:get_db_relevant_schemes uses df.iloc[idx]",
+    "query_cleaner": "backend/utils/text_processing.py:clean_text",
+    "index_build": "mini.ipynb embedding/index cells; backend/evaluation/results_rebuild/rebuild_notebook_artifacts.py"
+  },
+  "structural_checks": {
+    "csv_rows": 3400,
+    "faiss_vectors": 3400,
+    "counts_equal": true,
+    "index_dimension": 384,
+    "encoder_dimension": 384,
+    "metric_type": "METRIC_L2",
+    "all_returned_ids_in_csv_range": true
+  },
+  "source_row_order_check": {
+    "status": "PASSED",
+    "build_input_exists": true,
+    "row_count_equal": true,
+    "identity_columns_equal_in_order": true,
+    "note": "The production app loads dataset/govt_schemes.csv; the notebook build loads root dataset.csv."
+  },
+  "index_build_source_check": {
+    "status": "PASSED",
+    "notebook_evidence": [
+      "mini.ipynb encodes df['cleaned_text'] in dataframe order.",
+      "mini.ipynb creates IndexFlatL2 and calls index.add(scheme_embeddings)."
+    ],
+    "rebuild_evidence": "rebuild_notebook_artifacts.py reads dataset.csv, drops only Unnamed: 9, does not reorder rows, and encodes processed rows in order."
+  },
+  "reconstructed_vector_check": {
+    "status": "UNAVAILABLE",
+    "path": "model\\scheme_embeddings.npy",
+    "message": "Production saved embedding file is missing; reconstruct comparison was not possible."
+  },
+  "query_checks": {
+    "queries": 12,
+    "returned_rows": 60,
+    "top1_matches": 9,
+    "top1_match_rate": 0.75
+  },
+  "verdict": "PARTIALLY VERIFIED",
+  "interpretation": "Query matches are semantic retrieval evidence, not proof that all FAISS IDs are aligned. Positional alignment is supported only by the independent source-order comparison and, when available, exact reconstructed-vector comparison."
+}

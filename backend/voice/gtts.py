@@ -1,5 +1,6 @@
 """Text-to-speech processing."""
 import base64
+import logging
 import os
 import sys
 import tempfile
@@ -17,6 +18,8 @@ except ImportError:
     from models.schemas import SpeechRequest, SpeechResponse
     from utils.constants import TTS_LANGUAGE_MAP
     from utils.errors import format_speech_error, normalize_language_code
+
+logger = logging.getLogger(__name__)
 
 
 def _gtts_class():
@@ -62,6 +65,13 @@ def synthesize_audio(payload: SpeechRequest) -> SpeechResponse:
         )
 
     except Exception as exc:
+        # Provider, filesystem, and serialization errors cross this API boundary.
+        # Keep the traceback in backend logs without exposing provider details or
+        # request content to the caller.
+        logger.exception(
+            "TTS synthesis failed (provider=gTTS, language=%s)",
+            normalize_language_code(payload.language),
+        )
         return SpeechResponse(
             success=False,
             data=None,

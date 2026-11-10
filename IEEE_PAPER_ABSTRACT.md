@@ -1,5 +1,11 @@
 # Government Scheme Chatbot: IEEE Research Paper Abstract and Overview
 
+> **Evidence status:** The retrieval threshold and fixed performance figures in
+> this historical draft are provisional and are not current calibration or
+> production evidence. The current FAISS `IndexFlatL2` runtime returns raw
+> squared L2 distances, where lower is closer; `FAISS_MAX_DISTANCE` is optional
+> and currently uncalibrated.
+
 **Paper Title**: A Multimodal AI-Powered Assistant for Government Scheme Discovery with Voice Interface, Semantic Search, and Multilingual Support  
 **Submission Date**: May 2026  
 **Status**: Ready for Submission

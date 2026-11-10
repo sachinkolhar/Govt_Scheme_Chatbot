@@ -8,9 +8,8 @@ Customize the evaluation pipeline without modifying the main script.
 # Thresholds to Test
 # ============================================================================
 
-# List of FAISS confidence thresholds to evaluate
-# Default: [0.2, 0.3, 0.4, 0.5, 0.6]
-# Modify for more granular testing or different ranges
+# Legacy score values used only by the historical evaluator. They are not
+# squared-L2 distances and are not current calibration recommendations.
 THRESHOLDS_TO_TEST = [0.2, 0.3, 0.4, 0.5, 0.6]
 
 # For more granular testing (finer steps):
@@ -187,13 +186,14 @@ MAX_TEST_QUERIES = None
 # Recommendation Engine
 # ============================================================================
 
-# Criteria for recommended threshold
-# "f1_score": Use F1 score (recommended)
+# Criteria for legacy diagnostic summaries only; no production cutoff is
+# recommended by this configuration.
+# "f1_score": Compare F1 descriptively
 # "precision": Prioritize precision (fewer false positives)
 # "recall": Prioritize recall (fewer false negatives)
 RECOMMENDATION_METRIC = "f1_score"
 
-# If tie in metric score, use this as tiebreaker
+# If tie in a legacy diagnostic metric, use this as tiebreaker
 # Options: "accuracy", "precision", "recall", "f1_score"
 RECOMMENDATION_TIEBREAKER = "accuracy"
 

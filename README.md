@@ -173,7 +173,7 @@ npm run dev
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/MohamedDadapeer5/Government_Scheme_ChatBot.git
+git clone https://github.com/sachinkolhar/Govt_Scheme_Chatbot.git
 cd Government_Scheme_ChatBot
 ```
 
@@ -361,6 +361,7 @@ The system detects these keywords and returns only the requested section without
 
 - **Model**: OpenAI Whisper `small`, loaded in CPU mode at backend startup
 - **Endpoint**: `POST /api/audio/transcribe`
+- **System dependency**: Install FFmpeg separately from Python packages and ensure the `ffmpeg` executable is on the backend process `PATH`; Whisper uses it to decode uploaded audio.
 - **Audio processing**: MediaRecorder with echo cancellation, noise suppression, auto-gain control, and a 16 kHz sample rate
 - **Frontend**: Inline microphone control in the search and voice flows
 

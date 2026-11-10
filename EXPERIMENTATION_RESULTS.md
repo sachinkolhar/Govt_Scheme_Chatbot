@@ -1,5 +1,12 @@
 # Government Scheme Chatbot: Experimentation Results and Performance Analysis
 
+> **Evidence status:** The reported retrieval thresholds and fixed performance
+> figures in this historical report are provisional and are not current
+> calibration evidence or production configuration. The current FAISS
+> `IndexFlatL2` runtime returns raw squared L2 distances, where lower is closer;
+> an optional `FAISS_MAX_DISTANCE` cutoff is currently uncalibrated and must be
+> selected only with reviewed labels and a documented validation procedure.
+
 **Research Paper:** A Multi-modal AI-Powered Assistant for Government Scheme Discovery and Personalized Eligibility Matching  
 **Date:** May 2026  
 **Version:** 1.0

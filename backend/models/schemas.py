@@ -92,6 +92,14 @@ class ChatResponse(BaseModel):
     response_type: str = "direct_answer"
     source_scheme: Optional["SchemeResult"] = None
     relevant_schemes: List["SchemeResult"] = Field(default_factory=list)
+    sources: List["ChatSource"] = Field(default_factory=list)
+
+
+class ChatSource(BaseModel):
+    title: str
+    url: str
+    source_type: str = "official"
+    retrieved_at: Optional[str] = None
 
 
 # ---- Search Models ----
@@ -116,6 +124,10 @@ class SchemeResult(BaseModel):
     match_score: int = 0  # 0-100 percentage
     recommendation_reasons: List[str] = Field(default_factory=list)  # Why this scheme is recommended
     is_favorite: bool = False  # Whether user has favorited this scheme
+    source_title: Optional[str] = None
+    source_url: Optional[str] = None
+    source_type: Optional[str] = None
+    retrieved_at: Optional[str] = None
 
 
 class SearchResponse(BaseModel):
@@ -255,6 +267,7 @@ class VoiceAssistantChatRequest(BaseModel):
     query: str
     language: str = "en"
     history: List[ConversationMessage] = Field(default_factory=list)
+    conversation_id: Optional[str] = None
 
 
 class VoiceAssistantChatResponse(BaseModel):
@@ -308,6 +321,22 @@ class ChatState(BaseModel):
     """State tracking for multi-turn conversations."""
     pending_relevant_suggestions: bool = False
     last_query: str = ""
+    pending_question: Optional[str] = None
+    required_field: Optional[str] = None
+    clarification_context: str = ""
+    previous_candidates: List[dict] = Field(default_factory=list)
+    collected_facts: dict = Field(default_factory=dict)
+    conversation_id: str = ""
+    last_user_query: str = ""
+    rewritten_query: str = ""
+    active_scheme_id: Optional[str] = None
+    active_scheme_name: Optional[str] = None
+    recent_retrieved_scheme_ids: List[str] = Field(default_factory=list)
+    last_intent: str = "unknown"
+    target_group_context: Optional[str] = None
+    pending_action: Optional[str] = None
+    pending_original_query: Optional[str] = None
+    language: str = "en"
     updated_at: float = Field(default_factory=time.time)
 
 

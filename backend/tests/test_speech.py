@@ -151,6 +151,21 @@ class TestSpeechSynthesize:
         except Exception as e:
             pytest.fail(f"Response data is not valid base64: {e}")
 
+    def test_synthesize_provider_failure_is_logged_but_safely_reported(
+        self, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        class BrokenGTTS:
+            def __init__(self, text: str, lang: str, slow: bool) -> None:
+                raise ConnectionError("provider connection diagnostic")
+
+        monkeypatch.setattr("backend.main.gTTS", BrokenGTTS)
+        with caplog.at_level("ERROR", logger="backend.voice.gtts"):
+            response = main.synthesize_audio(main.SpeechRequest(text="Hello", language="en"))
+
+        assert response.success is False
+        assert "provider connection diagnostic" not in (response.error or "")
+        assert "provider connection diagnostic" in caplog.text
+
 
 class TestSpeechEndpointIntegration:
     """Integration tests for speech endpoints."""

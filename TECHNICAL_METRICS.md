@@ -1,5 +1,12 @@
 # Government Scheme Chatbot: Technical Metrics and Performance Summary
 
+> **Evidence status:** Reported retrieval thresholds and fixed metric targets
+> in this document are historical/provisional, not current calibration or
+> production evidence. The current FAISS `IndexFlatL2` runtime returns raw
+> squared L2 distances, where lower is closer. Any optional
+> `FAISS_MAX_DISTANCE` cutoff requires reviewed labels and a documented
+> validation procedure; it is currently uncalibrated.
+
 **Document Type**: IEEE Research Paper - Supplementary Material  
 **Date**: May 2026  
 **Version**: 1.0

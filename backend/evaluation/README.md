@@ -1,21 +1,27 @@
-# FAISS Threshold Evaluation Pipeline
+# Legacy FAISS Threshold Evaluation Pipeline
 
-A comprehensive evaluation framework for tuning the FAISS confidence threshold in the Government Schemes Chatbot.
+This is a legacy evaluation framework. Its historical examples and generated
+outputs are provisional and must not be treated as calibrated settings for the
+current `IndexFlatL2` runtime.
+
+The current runtime returns raw squared L2 distances: lower is closer. A
+validated `FAISS_MAX_DISTANCE` cutoff is optional and is not established by
+the examples in this document.
 
 ## Overview
 
-This pipeline helps you find the optimal confidence threshold for your semantic search-based chatbot by:
+This pipeline records threshold-based evaluation results by:
 
-- Testing multiple thresholds (0.2 to 0.6)
+- Testing historical diagnostic values (legacy only)
 - Calculating precision, recall, accuracy, and F1 scores
 - Identifying ambiguous matches (close top-2 scores)
 - Generating visualizations
-- Recommending the best threshold
+- Comparing provisional threshold results; it does not establish a production cutoff
 
 ## Files
 
 - **`evaluation_pipeline.py`** - Main evaluation script
-- **`test_queries.json`** - 65 labeled test queries (government schemes dataset)
+- **`test_queries.json`** - 64 current source-labeled queries
 - **`results/`** - Output directory for CSV files and visualizations
 
 ## Quick Start
@@ -58,10 +64,10 @@ cd backend/evaluation
 python evaluation_pipeline.py
 ```
 
-This will:
+This will run the legacy evaluator and:
 
-- Load 65 test queries
-- Test 5 thresholds: 0.2, 0.3, 0.4, 0.5, 0.6
+- Load 64 test queries
+- Test legacy diagnostic values; do not use them as current calibration
 - Calculate metrics for each threshold
 - Generate visualization plots
 - Print recommendations
@@ -96,8 +102,8 @@ Per-threshold metrics:
 
 **Use this to:**
 
-- Compare threshold performance
-- Select best F1 score
+- Compare legacy diagnostic values
+- Do not select a cutoff from these results
 - Balance precision vs recall
 
 #### `ambiguous_matches.csv`
@@ -157,10 +163,10 @@ Queries where top-2 scores are within 0.05:
 
 ## Interpreting Results
 
-### Example Output
+### Historical Example Output (Legacy, Provisional, Not Current Calibration)
 
 ```
-📊 BEST THRESHOLD: 0.35
+📊 LEGACY DIAGNOSTIC VALUE: 0.35
    F1 Score:        0.9128
    Accuracy:        0.8462
    Precision:       0.9286
@@ -172,8 +178,8 @@ Queries where top-2 scores are within 0.05:
 
 ### What This Means
 
-- **Threshold 0.35** balances precision and recall best
-- **F1 of 0.91** indicates excellent performance
+- **The displayed value is not a best threshold** and is historical only
+- **F1 of 0.91** reflects the historical labels and evaluator semantics only
 - **1 false positive** = 1 wrong scheme suggested when it shouldn't
 - **1 false negative** = 1 missed scheme that should have matched
 - **2 ambiguous** = 2 queries with close-call scores (manual review needed)
@@ -198,46 +204,58 @@ Edit `test_queries.json` to add queries:
 - Set to `null` if expecting no match
 - `expected_match` should be `true` only if scheme exists in dataset
 
-## Tuning Strategy
+## Legacy Tuning Strategy (Provisional, Not Suitable for Production Configuration)
+
+The old examples below are similarity-score-era guidance. They do not define a
+valid squared-L2 cutoff for the current index and are retained only as legacy
+history. A future cutoff must be selected from reviewed labels using a
+documented validation procedure, then reviewed against semantic relevance.
+`FAISS_MAX_DISTANCE` is optional and currently uncalibrated. Equal dataset and
+index counts do not prove FAISS-ID-to-dataset row alignment.
 
 ### Scenario 1: Too Many False Positives (wrong schemes suggested)
 
 - **Problem**: User gets incorrect suggestions
-- **Solution**: Raise threshold (0.5 → 0.6)
+- **Legacy solution**: Raise the old similarity threshold; not applicable to current L2 runtime
 - **Tradeoff**: May miss some valid schemes (higher false negatives)
 
 ### Scenario 2: Too Many False Negatives (missing schemes)
 
 - **Problem**: "Sorry, I don't have that scheme" even when it exists
-- **Solution**: Lower threshold (0.3 → 0.2)
+- **Legacy solution**: Lower the old similarity threshold; not applicable to current L2 runtime
 - **Tradeoff**: May suggest irrelevant schemes (higher false positives)
 
 ### Scenario 3: Balanced Approach
 
-- Use the threshold with highest F1 score
-- Typically 0.3-0.4 for good precision (90%+) and recall (90%+)
-- Monitor in production for user feedback
+- Do not select a cutoff from historical examples or fixed precision/recall/F1 targets
+- Use reviewed labels and a documented validation procedure
+- Keep semantic relevance separate from the numeric distance cutoff
 
 ## Integration
 
 ### Update Settings
 
-Once you've identified the best threshold:
+Once a maximum squared-L2 distance has been calibrated and validated:
 
 1. Update `backend/config/settings.py`:
 
 ```python
-# Before
-FAISS_MIN_SCORE = float(os.getenv("FAISS_MIN_SCORE", "0.2"))
+import os
 
-# After
-FAISS_MIN_SCORE = float(os.getenv("FAISS_MIN_SCORE", "0.35"))  # Your best threshold
+# Optional: FAISS returns squared L2 distances; lower is closer.
+# Leave unset until calibration is validated for the current index and encoder.
+raw_distance = os.getenv("FAISS_MAX_DISTANCE")
+FAISS_MAX_DISTANCE = float(raw_distance) if raw_distance else None
 ```
+
+`FAISS_MIN_SCORE` is deprecated. It is not a current configuration interface
+and works only through explicit `FAISS_ENABLE_LEGACY_MIN_SCORE=1` compatibility
+opt-in; its old values were not calibrated for the current `IndexFlatL2` index.
 
 2. Or set environment variable:
 
 ```bash
-export FAISS_MIN_SCORE=0.35
+export FAISS_MAX_DISTANCE=<validated_squared_l2_distance>
 python backend/main.py
 ```
 

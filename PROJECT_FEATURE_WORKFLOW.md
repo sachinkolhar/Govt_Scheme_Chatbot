@@ -228,7 +228,7 @@ The platform solves this by combining profile-based filtering, semantic search, 
 2. Frontend sends request to `/api/chat/stream` (or `/api/chat`).
 3. Backend reads conversation state using `conversation_id`.
 4. Query is semantically searched using FAISS candidates.
-5. Confidence threshold (`FAISS_MIN_SCORE`) is evaluated.
+5. The optional squared-L2 cutoff is evaluated: `distance <= FAISS_MAX_DISTANCE`.
 6. If confident match exists:
    - Retrieve top scheme
    - Detect requested section (eligibility/benefits/documents/application/details)
@@ -260,7 +260,7 @@ The platform solves this by combining profile-based filtering, semantic search, 
            |
            v
 +-------------------------------+
-| score >= FAISS_MIN_SCORE ?    |
+| distance <= FAISS_MAX_DISTANCE? |
 +-------------------------------+
     | Yes                          | No
     v                              v
@@ -284,13 +284,20 @@ The platform solves this by combining profile-based filtering, semantic search, 
 ### Search logic
 
 - Retrieves multiple semantic candidates (`top_k`-based).
-- Uses top score against threshold to determine confident match.
-- Highest-confidence row is used as source scheme.
+- Uses raw squared L2 distance, where lower is closer, against the optional
+  maximum-distance cutoff.
+- The numeric cutoff is not confidence or semantic relevance; the closest row
+  is used as the retrieval candidate.
 
-### Confidence threshold
+### Optional distance cutoff
 
-- `FAISS_MIN_SCORE` from configuration (default 0.2).
-- Low-confidence queries trigger no-data prompt + suggestion flow.
+- `FAISS_MAX_DISTANCE` is optional and currently uncalibrated.
+- It must not be selected from historical examples; calibration requires
+  reviewed labels and a documented validation procedure.
+- Index-to-dataset row alignment remains unverified. Equal counts do not prove
+  row-order alignment.
+- A query above the optional cutoff triggers the no-data prompt + suggestion
+  flow.
 
 ### Fallback behavior
 

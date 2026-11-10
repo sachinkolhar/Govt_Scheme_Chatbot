@@ -257,6 +257,13 @@ def disability_is_eligible(is_disabled: bool, text: str) -> bool:
 
 def is_eligible(profile: EligibilityRequest, row: pd.Series) -> bool:
     blob = text_blob(row)
+    # Do not reject an old-age or otherwise broad scheme because its narrative
+    # mentions disability services in passing. Disability exclusion requires a
+    # criterion in the scheme identity or eligibility rules.
+    disability_criteria = " ".join((
+        str(row.get("scheme_name", "")),
+        str(row.get("eligibility", "")),
+    )).lower()
     return (
         age_is_eligible(profile.age, blob)
         and gender_is_eligible(profile.gender, blob)
@@ -264,7 +271,7 @@ def is_eligible(profile: EligibilityRequest, row: pd.Series) -> bool:
         and state_is_eligible(profile.state, blob)
         and occupation_is_eligible(profile, blob)
         and income_is_eligible(profile.income, blob)
-        and disability_is_eligible(profile.disability, blob)
+        and disability_is_eligible(profile.disability, disability_criteria)
     )
 
 

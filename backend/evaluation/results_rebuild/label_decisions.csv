@@ -1,0 +1,121 @@
+query_number,query_text,source_expected_match,candidate_rank,candidate_dataset_row_index,candidate_slug,decision,verified_dataset_slug,rationale,evidence_reference,reviewer_id,confidence,second_review_status,notes
+7,senior citizen pension scheme,True,1,1433,igoapsm,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+7,senior citizen pension scheme,True,2,1434,ignoapsp,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+7,senior citizen pension scheme,True,3,1435,ignoaps-sikkim,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+8,old age pension benefits,True,1,1433,igoapsm,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+8,old age pension benefits,True,2,1434,ignoapsp,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+8,old age pension benefits,True,3,1435,ignoaps-sikkim,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+9,pension for elderly citizens,True,1,1433,igoapsm,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+9,pension for elderly citizens,True,2,1434,ignoapsp,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+9,pension for elderly citizens,True,3,1435,ignoaps-sikkim,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+10,health insurance for poor,True,1,2421,pmjdy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+10,health insurance for poor,True,2,2410,pmagy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+10,health insurance for poor,True,3,2435,pmuy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+11,ayushman bharat scheme,True,1,2421,pmjdy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+11,ayushman bharat scheme,True,2,2410,pmagy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+11,ayushman bharat scheme,True,3,2435,pmuy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+12,medical coverage government,True,1,2421,pmjdy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+12,medical coverage government,True,2,2410,pmagy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+12,medical coverage government,True,3,2435,pmuy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+13,house building loan schemes,True,1,2412,pmay-u,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+13,house building loan schemes,True,2,2435,pmuy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+13,house building loan schemes,True,3,2411,pmay-g,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+14,affordable housing scheme,True,1,2412,pmay-u,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+14,affordable housing scheme,True,2,2435,pmuy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+14,affordable housing scheme,True,3,2411,pmay-g,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+15,home construction assistance,True,1,2412,pmay-u,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+15,home construction assistance,True,2,2435,pmuy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+15,home construction assistance,True,3,2411,pmay-g,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+16,girl child education support,True,1,1771,cbssc-msy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+16,girl child education support,True,2,366,bsy-pudu,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+16,girl child education support,True,3,2923,ssyh,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+17,savings scheme for daughters,True,1,1771,cbssc-msy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+17,savings scheme for daughters,True,2,366,bsy-pudu,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+17,savings scheme for daughters,True,3,2923,ssyh,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+18,female child financial security,True,1,1771,cbssc-msy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+18,female child financial security,True,2,366,bsy-pudu,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+18,female child financial security,True,3,2923,ssyh,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+19,small business startup funding,True,1,2478,pmegp,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+19,small business startup funding,True,2,471,cmegp,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+19,small business startup funding,True,3,1913,megp,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+20,entrepreneurship loan scheme,True,1,2478,pmegp,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+20,entrepreneurship loan scheme,True,2,471,cmegp,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+20,entrepreneurship loan scheme,True,3,1913,megp,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+21,self employment assistance,True,1,2478,pmegp,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+21,self employment assistance,True,2,471,cmegp,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+21,self employment assistance,True,3,1913,megp,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+31,skill development training programs,True,1,1650,kvy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+31,skill development training programs,True,2,2432,pmsby,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+31,skill development training programs,True,3,2435,pmuy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+32,vocational training scheme,True,1,1650,kvy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+32,vocational training scheme,True,2,2432,pmsby,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+32,vocational training scheme,True,3,2435,pmuy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+33,job training government initiative,True,1,1650,kvy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+33,job training government initiative,True,2,2432,pmsby,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+33,job training government initiative,True,3,2435,pmuy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+34,labor welfare benefits schemes,True,1,537,cmbocwhrs,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+34,labor welfare benefits schemes,True,2,2564,rpcs,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+34,labor welfare benefits schemes,True,3,463,bocs,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+35,worker protection government,True,1,537,cmbocwhrs,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+35,worker protection government,True,2,2564,rpcs,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+35,worker protection government,True,3,463,bocs,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+36,occupational safety assistance,True,1,537,cmbocwhrs,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+36,occupational safety assistance,True,2,2564,rpcs,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+36,occupational safety assistance,True,3,463,bocs,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+40,maternity benefit scheme,True,1,1842,mbwb,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+40,maternity benefit scheme,True,2,1843,mbabocwwb,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+40,maternity benefit scheme,True,3,1848,mbobocwwb,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+41,pregnant women financial assistance,True,1,1842,mbwb,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+41,pregnant women financial assistance,True,2,1843,mbabocwwb,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+41,pregnant women financial assistance,True,3,1848,mbobocwwb,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+42,mother and child support,True,1,1842,mbwb,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+42,mother and child support,True,2,1843,mbabocwwb,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+42,mother and child support,True,3,1848,mbobocwwb,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+43,social security for workers,True,1,537,cmbocwhrs,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+43,social security for workers,True,2,2564,rpcs,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+43,social security for workers,True,3,463,bocs,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+44,unorganized sector workers benefits,True,1,537,cmbocwhrs,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+44,unorganized sector workers benefits,True,2,2564,rpcs,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+44,unorganized sector workers benefits,True,3,463,bocs,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+45,fishermen welfare schemes,True,1,2182,nswf,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+45,fishermen welfare schemes,True,2,1092,fars,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+45,fishermen welfare schemes,True,3,709,dvrsf,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+46,fishing industry support government,True,1,2182,nswf,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+46,fishing industry support government,True,2,1092,fars,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+46,fishing industry support government,True,3,709,dvrsf,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+47,marine resources assistance,True,1,2182,nswf,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+47,marine resources assistance,True,2,1092,fars,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+47,marine resources assistance,True,3,709,dvrsf,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+51,micro finance for women,True,1,2435,pmuy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+51,micro finance for women,True,2,2419,pmgsy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+51,micro finance for women,True,3,2421,pmjdy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+52,women entrepreneurship support,True,1,2435,pmuy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+52,women entrepreneurship support,True,2,2419,pmgsy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+52,women entrepreneurship support,True,3,2421,pmjdy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+53,female business loan,True,1,2435,pmuy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+53,female business loan,True,2,2419,pmgsy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+53,female business loan,True,3,2421,pmjdy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+54,education loan for college,True,1,2433,csss-cus,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+54,education loan for college,True,2,500,pmsoeds,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+54,education loan for college,True,3,2174,css-nos-st,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+55,student financial aid government,True,1,2433,csss-cus,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+55,student financial aid government,True,2,500,pmsoeds,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+55,student financial aid government,True,3,2174,css-nos-st,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+56,higher education assistance,True,1,2433,csss-cus,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+56,higher education assistance,True,2,500,pmsoeds,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+56,higher education assistance,True,3,2174,css-nos-st,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+60,SC ST scholarship scheme,True,1,2433,csss-cus,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+60,SC ST scholarship scheme,True,2,500,pmsoeds,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+60,SC ST scholarship scheme,True,3,2174,css-nos-st,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+61,reserved category student benefits,True,1,2433,csss-cus,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+61,reserved category student benefits,True,2,500,pmsoeds,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+61,reserved category student benefits,True,3,2174,css-nos-st,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+62,caste based assistance education,True,1,2433,csss-cus,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+62,caste based assistance education,True,2,500,pmsoeds,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+62,caste based assistance education,True,3,2174,css-nos-st,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+63,apprenticeship training schemes,True,1,1650,kvy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+63,apprenticeship training schemes,True,2,2432,pmsby,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+63,apprenticeship training schemes,True,3,2435,pmuy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+64,technical education support,True,1,1650,kvy,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+64,technical education support,True,2,2432,pmsby,,,,,,,pending,Source candidate from manual_review_worksheet.csv
+64,technical education support,True,3,2435,pmuy,,,,,,,pending,Source candidate from manual_review_worksheet.csv

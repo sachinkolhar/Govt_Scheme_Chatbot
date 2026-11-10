@@ -1,6 +1,8 @@
 import pytest
 
 import backend.main as main
+import backend.search.semantic as semantic
+from backend.chat.processor import stream_chat_events
 
 
 def _scheme_result(name: str, score: float = 0.91) -> main.SchemeResult:
@@ -108,12 +110,28 @@ def test_chat_section_only_answer_for_eligibility(monkeypatch: pytest.MonkeyPatc
     assert "**Eligibility**" in resp.answer
 
 
-def test_chat_unrelated_yes_when_not_pending_behaves_like_normal_query(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_chat_unrelated_yes_without_context_does_not_recommend_weak_match(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(main, "semantic_candidates", lambda _q, _k: [(0, 0.95)])
-    monkeypatch.setattr(main, "generate_answer_with_groq", lambda *_args, **_kwargs: "normal answer")
-
     resp = main.chat(main.ChatRequest(query="yes", conversation_id="conv-f"))
 
-    assert resp.response_type == "direct_answer"
-    assert resp.answer == "normal answer"
-    assert resp.source_scheme is not None
+    assert resp.response_type == "no_data_prompt"
+    assert resp.source_scheme is None
+
+
+def test_regular_chat_uses_shared_l2_distance_cutoff(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(semantic, "FAISS_MAX_DISTANCE", 2.0)
+    monkeypatch.setattr(main, "semantic_candidates", lambda _q, _k: [(0, 3.0)])
+
+    resp = main.chat(main.ChatRequest(query="too far", conversation_id="conv-g"))
+
+    assert resp.response_type == "no_data_prompt"
+
+
+def test_streaming_chat_uses_shared_l2_distance_cutoff(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(semantic, "FAISS_MAX_DISTANCE", 2.0)
+    monkeypatch.setattr(main, "semantic_candidates", lambda _q, _k: [(0, 3.0)])
+
+    events = list(stream_chat_events(main.ChatRequest(query="too far", conversation_id="conv-h")))
+    event_text = "".join(events)
+
+    assert '"value": "no_data_prompt"' in event_text

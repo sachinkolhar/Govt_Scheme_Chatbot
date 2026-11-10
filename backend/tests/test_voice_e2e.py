@@ -13,11 +13,27 @@ from pathlib import Path
 import backend.main as main
 
 
+@pytest.fixture(autouse=True)
+def mock_tts_provider(monkeypatch: pytest.MonkeyPatch) -> list[dict[str, object]]:
+    """Keep endpoint/integration tests deterministic without contacting gTTS."""
+    calls: list[dict[str, object]] = []
+
+    class FakeGTTS:
+        def __init__(self, text: str, lang: str, slow: bool) -> None:
+            calls.append({"text": text, "lang": lang, "slow": slow})
+
+        def save(self, path: str) -> None:
+            Path(path).write_bytes(b"ID3\x04\x00\x00\x00\x00\x00\x00")
+
+    monkeypatch.setattr(main, "gTTS", FakeGTTS)
+    return calls
+
+
 class TestBackendVoiceEndpoints:
     """Test backend speech endpoints with sample audio."""
 
-    def test_synthesize_english_text(self) -> None:
-        """Test TTS endpoint with English text - generates valid base64 audio."""
+    def test_synthesize_english_text(self, mock_tts_provider) -> None:
+        """Test English language mapping and base64 audio response handling."""
         payload = main.SpeechRequest(
             text="Tell me about housing schemes in India",
             language="en",
@@ -29,6 +45,7 @@ class TestBackendVoiceEndpoints:
         assert response.data is not None
         assert response.error is None
         assert response.language == "en"
+        assert mock_tts_provider == [{"text": payload.text, "lang": "en", "slow": False}]
 
         # Verify data is base64-encoded
         try:
@@ -39,8 +56,8 @@ class TestBackendVoiceEndpoints:
         except Exception as e:
             pytest.fail(f"Failed to decode base64 audio: {e}")
 
-    def test_synthesize_hindi_text(self) -> None:
-        """Test TTS with Hindi text."""
+    def test_synthesize_hindi_text(self, mock_tts_provider) -> None:
+        """Test Hindi language mapping and base64 audio response handling."""
         payload = main.SpeechRequest(
             text="भारत में सरकारी योजनाएं",
             language="hi",
@@ -50,8 +67,9 @@ class TestBackendVoiceEndpoints:
         assert response.success is True
         assert response.data is not None
         assert response.language == "hi"
+        assert mock_tts_provider[0]["lang"] == "hi"
 
-    def test_synthesize_lang_normalization(self) -> None:
+    def test_synthesize_lang_normalization(self, mock_tts_provider) -> None:
         """Test that invalid language normalizes to English."""
         payload = main.SpeechRequest(
             text="Test text",
@@ -62,23 +80,37 @@ class TestBackendVoiceEndpoints:
         # Should normalize to English, not fail
         assert response.language == "en"
         assert response.success is True
+        assert mock_tts_provider[0]["lang"] == "en"
+
+    @pytest.mark.parametrize(
+        ("input_language", "expected_language"),
+        [("EN", "en"), ("hi", "hi"), ("kn", "kn"), ("te", "te"), ("ta", "ta")],
+    )
+    def test_supported_tts_languages_use_project_language_codes(
+        self, input_language: str, expected_language: str, mock_tts_provider,
+    ) -> None:
+        response = main.synthesize_audio(
+            main.SpeechRequest(text="Hello", language=input_language),
+        )
+
+        assert response.success is True
+        assert response.language == expected_language
+        assert mock_tts_provider[0]["lang"] == expected_language
 
     def test_transcribe_with_mock_whisper(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        """Test transcription endpoint with mocked Whisper model."""
+        """Test transcription with mocked Whisper and mocked FFmpeg availability."""
 
         # Mock Whisper to avoid downloading the model during test
         class MockWhisperModel:
-            def transcribe(self, path: str, language: str = None) -> dict:
+            def transcribe(self, path: str, language: str = None, **_kwargs) -> dict:
                 return {
                     "text": "Tell me about scholarship schemes",
                 }
 
-        class MockWhisper:
-            @staticmethod
-            def load_model(model: str, device: str):
-                return MockWhisperModel()
-
-        monkeypatch.setattr("backend.main.whisper", MockWhisper)
+        monkeypatch.setattr("backend.voice.whisper._whisper_model", MockWhisperModel)
+        # The fake model does not invoke FFmpeg; satisfy only the endpoint's
+        # executable availability check rather than requiring a system install.
+        monkeypatch.setattr("backend.voice.whisper.shutil.which", lambda name: "ffmpeg.exe" if name == "ffmpeg" else None)
 
         # Create a minimal WAV file for testing
         wav_data = b"RIFF" + b"\x00" * 4 + b"WAVE" + b"\x00" * 100
@@ -184,6 +216,7 @@ class TestVoiceChatIntegration:
     def test_tts_audio_playback_chain(
         self,
         monkeypatch: pytest.MonkeyPatch,
+        mock_tts_provider,
     ) -> None:
         """Test complete TTS chain: Response text → base64 audio → frontend playback."""
         # Step 1: Generate text response (simulated chat response)
@@ -220,6 +253,7 @@ class TestVoiceLanguagePipeline:
     def test_english_voice_pipeline(
         self,
         monkeypatch: pytest.MonkeyPatch,
+        mock_tts_provider,
     ) -> None:
         """English: mic → STT (English) → chat → TTS (English) → playback."""
         # Step 1: Mock STT (English)
@@ -252,10 +286,12 @@ class TestVoiceLanguagePipeline:
         # Verify pipeline
         assert tts_resp.success is True
         assert tts_resp.language == "en"
+        assert mock_tts_provider[-1]["lang"] == "en"
 
     def test_hindi_voice_pipeline(
         self,
         monkeypatch: pytest.MonkeyPatch,
+        mock_tts_provider,
     ) -> None:
         """Hindi: mic → STT (Hindi) → chat (in Hindi) → TTS (Hindi) → playback."""
         # Step 1: Mock STT (Hindi)
@@ -288,6 +324,7 @@ class TestVoiceLanguagePipeline:
         # Verify Hindi pipeline
         assert tts_resp.success is True
         assert tts_resp.language == "hi"
+        assert mock_tts_provider[-1]["lang"] == "hi"
 
 
 class TestVoiceErrorRecovery:
@@ -330,7 +367,7 @@ class TestVoiceErrorRecovery:
         assert chat_response_text is not None
         assert len(chat_response_text) > 0
 
-    def test_language_fallback_on_unsupported_lang(self) -> None:
+    def test_language_fallback_on_unsupported_lang(self, mock_tts_provider) -> None:
         """Unsupported language falls back to English gracefully."""
         # Request TTS in unsupported language
         unsupported_lang = "fr"  # French not supported
@@ -344,6 +381,7 @@ class TestVoiceErrorRecovery:
         # Should succeed with English fallback
         assert response.success is True
         assert response.language == "en"  # Normalized to English
+        assert mock_tts_provider[0]["lang"] == "en"
 
 
 class TestVoiceEndToEndScenarios:
@@ -352,6 +390,7 @@ class TestVoiceEndToEndScenarios:
     def test_full_english_user_session(
         self,
         monkeypatch: pytest.MonkeyPatch,
+        mock_tts_provider,
     ) -> None:
         """
         English user session:
@@ -382,7 +421,9 @@ class TestVoiceEndToEndScenarios:
         )
         chat_resp = main.chat(chat_req)
 
-        assert chat_resp.response_type == "direct_answer"
+        # Missing applicant facts require clarification before an eligibility claim.
+        assert chat_resp.response_type == "clarification"
+        assert any(field in chat_resp.answer.lower() for field in ("income", "occupation", "state"))
 
         # Step 3: User enables audio playback → TTS converts response to audio
         tts_req = main.SpeechRequest(
@@ -399,6 +440,7 @@ class TestVoiceEndToEndScenarios:
     def test_hindi_user_follow_up_session(
         self,
         monkeypatch: pytest.MonkeyPatch,
+        mock_tts_provider,
     ) -> None:
         """
         Hindi user multi-turn:
@@ -449,9 +491,10 @@ class TestVoiceEndToEndScenarios:
         ]
 
         monkeypatch.setattr(
-            main, "get_db_relevant_schemes", lambda _q, limit=5: db_schemes[:limit]
+            main, "get_db_relevant_schemes",
+            lambda _q, limit=5: pytest.fail("official-web consent should not repeat local retrieval"),
         )
-        monkeypatch.setattr(main, "web_search_relevant_schemes", lambda _q, limit=5: [])
+        monkeypatch.setattr(main, "web_search_relevant_schemes", lambda _q, limit=5: db_schemes[:limit])
 
         chat_req_2 = main.ChatRequest(
             query=mic_yes_input,

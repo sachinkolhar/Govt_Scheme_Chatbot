@@ -138,10 +138,10 @@ def main():
             for png_file in sorted(output_dir.glob("*.png")):
                 print(f"  - {png_file.name}")
             print("\nNext steps:")
-            print("  1. Review evaluation_summary.csv for best threshold")
+            print("  1. Review evaluation_summary.csv as provisional legacy diagnostics")
             print("  2. Check evaluation_results_detailed.csv for failures")
             print("  3. View threshold_comparison.png for visualization")
-            print("  4. Update FAISS_MIN_SCORE in backend/config/settings.py")
+            print("  4. Set calibrated FAISS_MAX_DISTANCE in backend/config/settings.py or the environment")
         else:
             print("\n" + "=" * 80)
             print("❌ EVALUATION FAILED")

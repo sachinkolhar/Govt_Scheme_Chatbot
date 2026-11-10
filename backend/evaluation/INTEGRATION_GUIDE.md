@@ -9,7 +9,7 @@ backend/evaluation/
 ├── evaluation_pipeline.py          # Main evaluation script
 ├── run_evaluation.py               # Convenient runner with setup checks
 ├── usage_examples.py               # 6 practical usage examples
-├── test_queries.json               # 65 labeled test queries
+├── test_queries.json               # 64 current source-labeled queries
 ├── __init__.py                     # Package initialization
 ├── README.md                       # Detailed documentation
 ├── evaluation_requirements.txt     # Dependencies
@@ -39,9 +39,9 @@ This will:
 
 - ✓ Check all dependencies
 - ✓ Verify required files (encoder, FAISS index, dataset)
-- ✓ Run full evaluation across 5 thresholds
+- ✓ Run the legacy evaluator across historical diagnostic values
 - ✓ Generate CSV results and visualization
-- ✓ Print recommendations
+- ✓ Print provisional diagnostic summaries
 
 ### Step 3: Review Results
 
@@ -63,16 +63,17 @@ open results/threshold_comparison.png
 
 ### evaluation_summary.csv
 
-Shows performance at each threshold:
+Shows legacy diagnostic output. These values are not current calibration evidence:
 
 ```
 threshold,accuracy,precision,recall,f1_score,true_positives,...
-0.20,0.8231,0.8571,0.9286,0.8913,13,2,48,1,3
-0.30,0.8462,0.9091,0.9286,0.9189,13,1,49,1,2
-0.35,0.8615,0.9286,0.9286,0.9286,13,1,50,1,1
+0.20,...
+0.30,...
+0.35,...
 ```
 
-**Select threshold with highest F1 score** (0.35 in this example)
+Do not select a cutoff from this output. The legacy evaluator uses
+higher-is-better score logic and is not a current `IndexFlatL2` calibration.
 
 ### evaluation_results_detailed.csv
 
@@ -80,8 +81,8 @@ Per-query evaluation results:
 
 ```
 query,expected_scheme,matched_scheme,top_score,accepted,correct
-"PM Kisan benefits","PM-KISAN","PM-KISAN","0.8234","Yes","Yes"
-"driving license","null","PM-KISAN","0.3145","Yes","No"
+"PM Kisan benefits","PM-KISAN","PM-KISAN","<raw squared L2 distance>","Yes","Yes"
+"driving license","null","PM-KISAN","<raw squared L2 distance>","Yes","No"
 ```
 
 **Use to:**
@@ -96,7 +97,7 @@ Queries where top-2 scores are very close (<0.05 gap):
 
 ```
 query,expected_scheme,matched_scheme,top_score,second_score,gap,threshold
-"elderly pension","IGN Old Age","IGN Widow","0.7234","0.6823","0.0411",0.30
+"elderly pension","IGN Old Age","IGN Widow","<distance>","<distance>","<distance gap>",<legacy diagnostic value>
 ```
 
 **These need manual review** - threshold change might flip their classification
@@ -112,28 +113,46 @@ query,expected_scheme,matched_scheme,top_score,second_score,gap,threshold
 
 ## 🎯 Implementation Steps
 
-### Step 1: Identify Best Threshold
+### Step 1: Understand the Current Runtime Semantics
 
-From `evaluation_summary.csv`, find row with highest **F1 Score**:
+`IndexFlatL2` returns raw squared L2 distances. Lower distance means closer;
+the value is not confidence or similarity. A maximum-distance cutoff, when
+configured, is applied as:
 
+```python
+accepted = distance <= FAISS_MAX_DISTANCE
 ```
-threshold: 0.35
-f1_score:  0.9189
-```
 
-### Step 2: Update Settings
+`FAISS_MAX_DISTANCE` is optional and currently uncalibrated. A cutoff must not
+be selected from historical examples. Calibration requires reviewed labels and
+a documented validation procedure. Semantic relevance is separate from the
+numeric distance cutoff.
+
+The current query file contains 64 queries. FAISS index-to-dataset row
+alignment remains unverified: equal vector and dataset counts do not prove
+row-order alignment.
+
+### Step 2: Review Legacy Evaluation Only
+
+The historical evaluation output is provisional. It does not establish a
+production cutoff for the current squared-L2 index. Do not copy its numeric
+threshold into runtime settings without new calibration and label review.
+
+Historical threshold and metric values may appear in generated legacy output;
+they are provisional, not current calibration, and not suitable for production
+configuration.
+
+### Step 3: Set Only a Validated Maximum Distance
 
 Edit `backend/config/settings.py`:
 
 ```python
-# Before
-FAISS_MIN_SCORE = float(os.getenv("FAISS_MIN_SCORE", "0.2"))
-
-# After
-FAISS_MIN_SCORE = float(os.getenv("FAISS_MIN_SCORE", "0.35"))
+# Optional; leave unset until a squared-L2 cutoff is validated.
+raw_distance = os.getenv("FAISS_MAX_DISTANCE")
+FAISS_MAX_DISTANCE = float(raw_distance) if raw_distance else None
 ```
 
-### Step 3: Test in Chatbot
+### Step 4: Test in Chatbot
 
 Restart the backend:
 
@@ -144,7 +163,7 @@ python main.py
 
 Test with queries from `test_queries.json` to verify behavior matches expectations.
 
-### Step 4: Monitor in Production
+### Step 5: Monitor in Production
 
 Track metrics:
 
@@ -158,46 +177,36 @@ Track metrics:
 
 Users get wrong scheme suggestions
 
-**Solution:** Increase threshold
-
-```
-Current: 0.35 → Try: 0.40 or 0.45
-```
+**Solution:** Recalibrate the optional maximum squared-L2 distance using
+reviewed labels and the documented validation procedure. Do not infer a cutoff
+from historical values.
 
 **Steps:**
 
 1. Re-run evaluation with new threshold
-2. Check false positives decrease
-3. Accept slight increase in false negatives
-4. Update settings.py
+2. Check false positives decrease on validation data
+3. Confirm semantic relevance separately from the numeric cutoff
+4. Update settings.py only after validation
 
 ### Problem: Too Many False Negatives
 
 Users get "scheme not found" for valid schemes
 
-**Solution:** Decrease threshold
-
-```
-Current: 0.35 → Try: 0.30 or 0.25
-```
+**Solution:** Recalibrate the optional maximum squared-L2 distance using
+reviewed labels and the documented validation procedure. Do not infer a cutoff
+from historical values.
 
 **Steps:**
 
 1. Re-run evaluation with new threshold
-2. Check false negatives decrease
-3. Accept slight increase in false positives
-4. Update settings.py
+2. Check false negatives decrease on validation data
+3. Confirm semantic relevance separately from the numeric cutoff
+4. Update settings.py only after validation
 
-### Problem: Can't Decide Between Thresholds
+### Problem: Can't Decide Between Cutoffs
 
-Use F1 score as tiebreaker
-
-**Why F1 Score?**
-
-- Balances precision and recall
-- Single number for easy comparison
-- Standard in ML evaluation
-- Recommended for this use case
+Do not choose from historical output. Define a reviewed-label validation split,
+document the selection rule, and report the held-out result separately.
 
 ## 🔍 Advanced: Custom Test Sets
 
@@ -307,7 +316,7 @@ See `usage_examples.py` for 6 complete working examples.
 
 ## 🧪 Testing Your Updates
 
-After changing `FAISS_MIN_SCORE`:
+After changing a validated `FAISS_MAX_DISTANCE` value:
 
 ### Test 1: Manual Testing
 
@@ -374,12 +383,12 @@ Track your evaluation work:
 # Save evaluation results
 git add backend/evaluation/results/
 git add backend/evaluation/test_queries.json
-git commit -m "Evaluation: Best threshold=0.35 (F1=0.92)"
+git commit -m "Record provisional FAISS L2 evaluation diagnostics"
 
 # Track settings changes
 git diff backend/config/settings.py
 git add backend/config/settings.py
-git commit -m "Update FAISS_MIN_SCORE to 0.35"
+git commit -m "Update validated FAISS_MAX_DISTANCE"
 ```
 
 ## 🐛 Troubleshooting
@@ -428,13 +437,13 @@ Debug steps:
 ## ✅ Checklist: Before Going to Production
 
 - [ ] Run `python run_evaluation.py` successfully
-- [ ] Review `evaluation_summary.csv` - best threshold identified
+- [ ] Review `evaluation_summary.csv` as provisional diagnostics only
 - [ ] Check `threshold_comparison.png` - trends look reasonable
 - [ ] Review `ambiguous_matches.csv` - understand edge cases
-- [ ] Update `backend/config/settings.py` with new threshold
+- [ ] Update `backend/config/settings.py` only with a validated `FAISS_MAX_DISTANCE`
 - [ ] Restart backend and test manually
 - [ ] Add 5-10 real-world test cases to `test_queries.json`
-- [ ] Document threshold choice in commit message
+- [ ] Document the reviewed-label validation procedure in the change record
 - [ ] Set up monitoring for false positives/negatives
 - [ ] Plan quarterly re-evaluation
 

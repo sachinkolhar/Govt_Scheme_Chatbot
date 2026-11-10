@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""
-Manual Voice Endpoint Testing Script
-Directly tests the /api/audio/transcribe and /api/audio/synthesize endpoints
-"""
+"""Manual voice endpoint testing script for a separately running local API."""
+
+# Prevent pytest from treating CLI helper functions as fixture-driven tests.
+__test__ = False
 
 import base64
 import json

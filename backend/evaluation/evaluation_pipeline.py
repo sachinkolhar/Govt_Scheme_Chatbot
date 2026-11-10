@@ -1,9 +1,11 @@
 """
-FAISS Confidence Threshold Evaluation Pipeline
-===============================================
+Legacy FAISS Threshold Evaluation Pipeline
+===========================================
 
-This script evaluates and tunes the FAISS confidence threshold for optimal
-chatbot performance by testing multiple thresholds against a labeled dataset.
+This script preserves the historical higher-is-better score evaluator. It is
+not authoritative for the current IndexFlatL2 runtime, which returns raw
+squared L2 distances where lower is closer. Its threshold values and metrics
+are provisional diagnostics, not calibration or production configuration.
 
 Usage:
     python evaluation_pipeline.py
@@ -572,10 +574,10 @@ def print_recommendations(metrics_list: List[ThresholdMetrics]) -> None:
     print("EVALUATION SUMMARY & RECOMMENDATIONS")
     print("=" * 80)
     
-    # Find best threshold by F1 score
+    # Report the maximum-F1 legacy diagnostic value; it is not calibration.
     best_metrics = max(metrics_list, key=lambda m: m.f1_score)
     
-    print(f"\n📊 BEST THRESHOLD: {best_metrics.threshold:.2f}")
+    print(f"\n📊 LEGACY MAX-F1 VALUE (NOT CALIBRATED): {best_metrics.threshold:.2f}")
     print(f"   F1 Score:        {best_metrics.f1_score:.4f}")
     print(f"   Accuracy:        {best_metrics.accuracy:.4f}")
     print(f"   Precision:       {best_metrics.precision:.4f}")

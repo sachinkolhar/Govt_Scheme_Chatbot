@@ -1,30 +1,52 @@
 """Voice assistant request processing."""
 from fastapi import HTTPException
+import re
 
 try:
     from ..chat.groq_client import (
-        generate_voice_assistant_answer_with_groq,
         get_voice_eligibility_criteria_with_groq,
     )
     from ..models.schemas import (
+        ChatRequest,
         VoiceAssistantChatRequest,
         VoiceAssistantChatResponse,
         VoiceEligibilityCriteriaRequest,
         VoiceEligibilityCriteriaResponse,
     )
+    from ..chat.processor import process_chat
     from ..utils.errors import normalize_language_code
 except ImportError:
     from chat.groq_client import (
-        generate_voice_assistant_answer_with_groq,
         get_voice_eligibility_criteria_with_groq,
     )
     from models.schemas import (
+        ChatRequest,
         VoiceAssistantChatRequest,
         VoiceAssistantChatResponse,
         VoiceEligibilityCriteriaRequest,
         VoiceEligibilityCriteriaResponse,
     )
+    from chat.processor import process_chat
     from utils.errors import normalize_language_code
+
+
+def format_voice_response(text: str, max_chars: int = 420) -> str:
+    """Remove speech-unfriendly markup and keep spoken replies short."""
+    cleaned = re.sub(r"```.*?```", " ", text or "", flags=re.DOTALL)
+    cleaned = re.sub(r"[`*_#]", "", cleaned)
+    cleaned = re.sub(r"^\s*[-•]\s*", "", cleaned, flags=re.MULTILINE)
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    questions = list(re.finditer(r"\?", cleaned))
+    if len(questions) > 1:
+        # Keep the first question only when the response contains several prompts.
+        end = questions[0].end()
+        later = cleaned[end:]
+        if re.search(r"\b(what|which|where|when|how|are you|do you)\b", later, re.IGNORECASE):
+            cleaned = cleaned[:end]
+    if len(cleaned) > max_chars:
+        shortened = cleaned[: max_chars - 1].rsplit(" ", 1)[0].rstrip(" ,;:")
+        cleaned = shortened + "…"
+    return cleaned
 
 
 def process_voice_assistant_chat(
@@ -35,11 +57,15 @@ def process_voice_assistant_chat(
         raise HTTPException(status_code=400, detail="Query cannot be empty")
 
     language = normalize_language_code(payload.language)
-    answer = generate_voice_assistant_answer_with_groq(
-        query=query,
-        language=language,
-        history=payload.history,
+    chat_response = process_chat(
+        ChatRequest(
+            query=query,
+            language=language,
+            history=payload.history,
+            conversation_id=payload.conversation_id,
+        )
     )
+    answer = format_voice_response(chat_response.answer)
 
     return VoiceAssistantChatResponse(
         query=query,
